@@ -11,3 +11,15 @@ engine = create_engine(db_connection_string, connect_args={
 })
 
 
+def load_plasser_from_db():
+    with engine.connect() as conn:
+        result = conn.execute(text("select * from plasser"))
+        plasser = []
+
+        for row in result.all():
+            plass = dict(zip(result.keys(), row))
+            plasser.append(plass)
+            print(row)
+        return plasser
+
+
