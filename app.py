@@ -1,27 +1,24 @@
 from flask import Flask, render_template, request
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import routes as routes
 import database as db
 import locale
-
+from sqlalchemy import create_engine, text
 
 
 
 app = Flask(__name__)
 
-locale.setlocale(locale.LC_TIME, 'nb_NO')
-ukedager = {}
-today = datetime.today()
-two_weeks = timedelta(weeks=0)
-future_date = today + two_weeks
-for i in range(5):
-    while True:
-        future_date += timedelta(days=1)
-        if future_date.weekday() < 5: # If weekday
-            break # Exit the loop
-    # Add the day and date of the weekday to the dictionary
-    ukedager[future_date.strftime('%A').capitalize()] = future_date.strftime('%d-%m-%Y')
 
+
+
+db_connection_string = "mysql+pymysql://79kexqsirs64sn6p9efl:pscale_pw_sR4nRGuRIw8SBA1TpCOkIxYgxYnoJNf89zaF2eQuqSw@aws.connect.psdb.cloud/paakontoret"
+engine = create_engine(db_connection_string, connect_args={
+    "ssl": {
+        "ssl_ca": "/etc/ssl/cert.pem"
+    }
+
+})
 
 
 
@@ -30,17 +27,61 @@ for i in range(5):
 
 
 @app.route("/")
-def load_booked_plasser():
-    plasser = db.load_plasser_from_db()
-    print(ukedager)
+
+
+def load_booked_plasser(dato=date.today()):
+    locale.setlocale(locale.LC_TIME, 'nb_NO')
+    ukedager = {}
+    today = datetime.today()
+    ukedager[today.strftime('%A').capitalize()] = today.strftime('%d-%m-%Y')
+
+    two_weeks = timedelta(weeks=0)
+    future_date = today + two_weeks
+
+    for i in range(4):
+        while True:
+            future_date += timedelta(days=1)
+            if future_date.weekday() < 5:  # If weekday
+                break  # Exit the loop
+        # Add the day and date of the weekday to the dictionary
+        ukedager[future_date.strftime('%A').capitalize()] = future_date.strftime('%d-%m-%Y')
+
+    plasser = db.load_plasser_from_db(dato)
+    print(plasser)
     return render_template('home.html', plasser=plasser, ukedager=ukedager)
 
-@app.route('/my_function', methods=['POST'])
-def test():
+@app.route('/show_booked', methods=['POST'])
+def vis_booked():
     dato = request.json['dato']
-    print(dato)
-    msg = "Alex er kul"
-    return msg
+    with engine.connect() as conn:
+        result = conn.execute(text(
+            f"SELECT bp.plass_id,bp.bruker_id,bp.booket_dato FROM paakontoret.booked_plasser bp  Where bp.booket_dato = '{dato}';"))
+
+        data_list = []
+        for row in result.all():
+            data_dict = dict(zip(result.keys(), row))
+            data_list.append(data_dict)
+
+        plasser = data_list
+        print(plasser)
+        return plasser
+
+@app.route('/book', methods=['POST'])
+def book_plass():
+    bookings = request.json['navn','plassID','bookings_dato']
+    # with engine.connect() as conn:
+    #     result = conn.execute(text(
+    #         f"SELECT bp.plass_id,bp.bruker_id,bp.booket_dato FROM paakontoret.booked_plasser bp  Where bp.booket_dato = '{dato}';"))
+    #
+    #     data_list = []
+    #     for row in result.all():
+    #         data_dict = dict(zip(result.keys(), row))
+    #         data_list.append(data_dict)
+    #
+    #     plasser = data_list
+    #     print(plasser)
+    print(bookings)
+    return bookings
 
 
 if __name__ == "__main__":
