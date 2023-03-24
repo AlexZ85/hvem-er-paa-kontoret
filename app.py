@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from datetime import datetime, timedelta, date
 import routes as routes
 import database as db
@@ -67,21 +67,11 @@ def vis_booked():
         return plasser
 
 @app.route('/book', methods=['POST'])
-def book_plass():
-    bookings = request.json['navn','plassID','bookings_dato']
-    # with engine.connect() as conn:
-    #     result = conn.execute(text(
-    #         f"SELECT bp.plass_id,bp.bruker_id,bp.booket_dato FROM paakontoret.booked_plasser bp  Where bp.booket_dato = '{dato}';"))
-    #
-    #     data_list = []
-    #     for row in result.all():
-    #         data_dict = dict(zip(result.keys(), row))
-    #         data_list.append(data_dict)
-    #
-    #     plasser = data_list
-    #     print(plasser)
-    print(bookings)
-    return bookings
+def book():
+    data = request.get_json()
+    print(data)
+    return jsonify({'status': 'success'})
+
 
 
 if __name__ == "__main__":
