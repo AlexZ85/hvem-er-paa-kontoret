@@ -30,7 +30,7 @@ engine = create_engine(db_connection_string, connect_args={
 
 
 def load_booked_plasser(dato=date.today()):
-    locale.setlocale(locale.LC_TIME, 'nb_NO')
+    #locale.setlocale(locale.LC_TIME, 'nb_NO') støttes ikke av onrender
     ukedager = {}
     today = datetime.today()
     ukedager[today.strftime('%A').capitalize()] = today.strftime('%d-%m-%Y')
