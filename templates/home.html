@@ -144,28 +144,35 @@ for (let i = 0; i < clickableAreas.length; i++) {
       const cookieResult = check_cookie();
       clickedAreaId = clickableAreas[i].id;
       const activeNavLink = document.querySelector('.nav-link.active');
-      const aktiv_dato = activeNavLink.getAttribute('data-dato');
+      const booke_dato = activeNavLink.getAttribute('data-dato');
 
-      console.log(cookieResult, clickedAreaId,aktiv_dato);
-      book(cookieResult, clickedAreaId, aktiv_dato);
-      console.log(`Clicked ${clickedAreaId}`);
+      console.log(cookieResult, clickedAreaId,booke_dato);
+      book(cookieResult, clickedAreaId, booke_dato);
+
     }
   });
 }
 
 
-function book(cookieResult, clickedAreaId) {
+function book(cookieResult, clickedAreaId, booke_dato) {
   fetch('/book', {
     method: 'POST',
-    body: JSON.stringify({ 'cookie_result': cookieResult, 'clicked_area_id': clickedAreaId}),
+    body: JSON.stringify({ 'cookie_result': cookieResult, 'clicked_area_id': clickedAreaId, 'booke_dato': booke_dato}),
     headers: {
       'Content-Type': 'application/json'
     }
   })
-  .then(response => response.json())
+  .then(response => {
+    if (response.ok) {
+      location.reload();
+    } else {
+      return response.json();
+    }
+  })
   .then(data => console.log(data))
   .catch(error => console.error(error));
 }
+
 
 
 

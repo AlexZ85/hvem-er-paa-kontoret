@@ -69,9 +69,22 @@ def vis_booked():
 @app.route('/book', methods=['POST'])
 def book():
     data = request.get_json()
-    print(data)
-    return jsonify({'status': 'success'})
 
+    # Extract the values from the JSON object
+    bruker_navn = data['cookie_result']
+    plass_id = data['clicked_area_id']
+    booket_dato = data['booke_dato']
+    print(bruker_navn, plass_id, booket_dato)
+
+    with engine.connect() as conn:
+        result = conn.execute(text(
+            f"INSERT INTO paakontoret.booked_plasser(plass_id, bruker_id, booket_dato) VALUES ({plass_id}, '{bruker_navn}', '{booket_dato}')"
+        ))
+        print(f"{result.rowcount} rows inserted")
+
+
+    # Return a JSON response
+    return jsonify({'message': 'Data processed successfully'})
 
 
 if __name__ == "__main__":
