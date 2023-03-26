@@ -43,10 +43,7 @@ def list_weekday_dates():
 
 @app.route("/")
 def load_booked_plasser(dato=date.today()):
-    # locale.setlocale(locale.LC_TIME, 'nb_NO') støttes ikke av onrender
-    plasser = db.load_plasser_from_db(dato)
-
-    return render_template('home.html', plasser=plasser, ukedager=list_weekday_dates())
+    return render_template('home.html', plasser=db.load_plasser_from_db(dato), ukedager=list_weekday_dates())
 
 
 @app.route('/show_booked', methods=['POST'])
@@ -68,6 +65,7 @@ def vis_booked():
 
 @app.route('/book', methods=['POST'])
 def book():
+    print("hei")
     data = request.get_json()
 
     # Extract the values from the JSON object
