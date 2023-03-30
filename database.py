@@ -13,8 +13,8 @@ engine = create_engine(db_connection_string, connect_args={
 def load_plasser_from_db(dato):
     plasser = {}
     with engine.connect() as conn:
-        result = conn.execute(text(f"SELECT bp.plass_id,bp.bruker_id,bp.booket_dato FROM paakontoret.booked_plasser "
-                                   f"bp Where bp.booket_dato = '{dato}';"))
+        result = conn.execute(text(f"SELECT plass_id,bruker_id,bookings_dato FROM paakontoret.bookings"
+                                   f" Where bookings_dato = '{dato}';"))
 
         data_list = []
         for row in result.all():
@@ -22,5 +22,5 @@ def load_plasser_from_db(dato):
             data_list.append(data_dict)
 
         plasser = data_list
-
+        print(plasser)
         return plasser

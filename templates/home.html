@@ -1,346 +1,761 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
-<title>Hei, er du på kontoret eller ei</title>
-  <style>
-        body {
-            background-color: #c4c4c7
-        }
-
-        .nav-link.active {
-            background-color: #4682B4;
-        }
-
-        .clickable-area {
-            display: block;
-            position: absolute;
-            background-color: transparent;
-            cursor: pointer;
-        }
-
-        .highlight {
-            background-color: red;
-        }
-
-.clickable-area {
-  position: absolute;
-}
-
-.clickable-area[title="Plass_id_2"] {
-  top: 455px;
-  left: 134px;
-  width: 49px;
-  height: 92px;
-}
-
-.clickable-area[title="Plass_id_3"] {
-  top: 266px;
-  left: 286px;
-  width: 39px;
-  height: 81px;
-}
-
-.clickable-area[title="Plass_id_4"] {
-  top: 357px;
-  left: 240px;
-  width: 74px;
-  height: 92px;
-}
-
-.clickable-area[title="Plass_id_5"] {
-  top: 258px;
-  left: 571px;
-  width: 79px;
-  height: 76px;
-}
-
-.clickable-area[title="Plass_id_6"] {
-  top: 349px;
-  left: 546px;
-  width: 85px;
-  height: 94px;
-}
-
-.clickable-area[title="Plass_id_7"] {
-  top: 258px;
-  left: 669px;
-  width: 78px;
-  height: 68px;
-}
-
-.clickable-area[title="Plass_id_8"] {
-  top: 344px;
-  left: 658px;
-  width: 81px;
-  height: 84px;
-}
-
-.clickable-area[title="Plass_id_9"] {
-  top: 244px;
-  left: 935px;
-  width: 57px;
-  height: 73px;
-}
-
-.clickable-area[title="Plass_id_10"] {
-  top: 334px;
-  left: 945px;
-  width: 60px;
-  height: 87px;
-}
-
-.clickable-area[title="Plass_id_11"] {
-  top: 239px;
-  left: 1035px;
-  width: 49px;
-  height: 71px;
-}
-
-.clickable-area[title="Plass_id_12"] {
-  top: 330px;
-  left: 1054px;
-  width: 79px;
-  height: 82px;
-}
-
-.clickable-area[title="Plass_id_13"] {
-  top: 232px;
-  left: 1276px;
-  width: 63px;
-  height: 68px;
-}
-
-.clickable-area[title="Plass_id_14"] {
-  top: 322px;
-  left: 1323px;
-  width: 35px;
-  height: 76px;
-}
-
-.clickable-area[title="Plass_id_15"] {
-  top: 231px;
-  left: 1374px;
-  width: 57px;
-  height: 65px;
-}
-
-.clickable-area[title="Plass_id_16"] {
-  top: 315px;
-  left: 1426px;
-  width: 78px;
-  height: 76px;
-}
-
-    </style>
+    <title>Book kontorplass</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-aFq/bzH65dt+w6FI2ooMVUpc+21e0SRygnTpmBvdBgSdnuTN7QbdgL+OapgHtvPp" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js" integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N" crossorigin="anonymous"></script>
+	<script src="https://d3js.org/d3.v7.min.js"></script>
 
 
+<style>
+  {% for plass in oppttate_plasser %}
 
+    #Plass_id_{{ plass.plass_id }} path  {
+      fill: red;
+    }
 
+  {% endfor %}
+
+	.selected path {
+    fill: blue;
+  }
+
+</style>
+<!--    <script>-->
+<!--       $(document).ready(function(){-->
+<!--  $(".nav-link").click(function(){-->
+<!--    $(".nav-link").removeClass("active"); // remove active class from all buttons-->
+<!--    $(this).addClass("active"); // add active class to the clicked button-->
+<!--  });-->
+<!--});-->
+
+<!--    </script>-->
+
+	<script>
+  $(document).ready(function() {
+    $(".nav-link").eq(0).addClass("active"); // add active class to the first nav-link element
+    $(".nav-link").click(function() {
+      $(".nav-link").removeClass("active"); // remove active class from all buttons
+      $(this).addClass("active"); // add active class to the clicked button
+    });
+  });
+</script>
 
 </head>
-<body onload="showActiveBooked()">
+
+<body style="background-color: #343a40 ">
+<div class="m-4">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a href="#" class="navbar-brand">Når er du på kontoret?</a>
+            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse1">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse1">
+                <div class="navbar-nav">
+                    {% for dag, dato in ukedager.items() %}
+                    <a href="#" class="nav-item nav-link ">{{ dag }} {{ dato }}</a>
+                     {% endfor %}
+
+                </div>
+                <form class="d-flex ms-auto">
+                    <input type="text" class="form-control me-sm-2" placeholder="Navn" required>
+                    <input class="form-control" readonly type="text" placeholder="Valgt Plass" style="background-color: gray">
+					<input class="form-control" readonly type="text" placeholder="Valgt Dato" style="background-color: gray">
+                    <button type="submit" class="btn btn-outline-light">Book</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+    </div>
 
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
-  <div class="collapse navbar-collapse" id="navbarNav">
-    <ul class="navbar-nav">
-      {% for dag, dato in ukedager.items() %}
-      <li class="nav-item item">
-        <a class="nav-link {% if loop.first %}active{% endif %} item " href="#" onclick="show_booked('{{ dato }}')" id="{% if loop.first %}active-link{% endif %}" data-dato="{{ dato }}">{{ dag }} {{ dato }}</a>
-      </li>
-      {% endfor %}
-    </ul>
-  </div>
-</nav>
+<style>
+  /* Style the circle element in the SVG */
 
-
-    <h1> Er du på kontoret?</h1>
+  		.s0 { fill: #ffffff;stroke: #000000 }
+		.s1 { fill: none;stroke: #000000 }
+		.s2 { fill: #036897;stroke: #ffffff;stroke-linejoin: round;stroke-width: 2 }
+		.s3 { fill: none;stroke: #ffffff;stroke-width: 2 }
+		.s4 { fill: none;stroke: #ffffff;stroke-linejoin: round;stroke-width: 2 }
+		.s5 { fill: #036897;stroke: #ffffff;stroke-width: 2 }
 
 
 
-<div style="text-align: center;">
 
-    <!-- Image Map Generated by http://www.image-map.net/ -->
-<!--<img src="static/floorplan.png" usemap="#image-map">-->
+</style>
 
-<!--<map name="image-map">-->
-<!--    <area target="" alt="Plass_id_1" title="Plass_id_1" href="" coords="275,344,196,347,232,271,302,268" shape="poly">-->
-<!--    <area target="" alt="Plass_id_2" title="Plass_id_2" href="" coords="134,455,183,363,256,363,218,452" shape="poly">-->
-<!--    <area target="" alt="Plass_id_3" title="Plass_id_3" href="" coords="390,266,325,266,286,347,365,342" shape="poly">-->
-<!--    <area target="" alt="Plass_id_4" title="Plass_id_4" href="" coords="354,357,283,360,240,449,327,449" shape="poly">-->
-<!--    <area target="" alt="Plass_id_5" title="Plass_id_5" href="" coords="590,258,650,252,641,328,571,334" shape="poly">-->
-<!--    <area target="" alt="Plass_id_6" title="Plass_id_6" href="" coords="563,349,631,347,625,433,546,439" shape="poly">-->
-<!--    <area target="" alt="Plass_id_7" title="Plass_id_7" href="" coords="679,258,747,255,745,326,669,326" shape="poly">-->
-<!--    <area target="" alt="Plass_id_8" title="Plass_id_8" href="" coords="669,344,739,338,734,428,658,428" shape="poly">-->
-<!--    <area target="" alt="Plass_id_9" title="Plass_id_9" href="" coords="929,244,986,239,1005,315,935,317" shape="poly">-->
-<!--    <area target="" alt="Plass_id_10" title="Plass_id_10" href="" coords="940,334,1005,334,1021,421,945,421" shape="poly">-->
-<!--    <area target="" alt="Plass_id_11" title="Plass_id_11" href="" coords="1024,239,1084,236,1105,310,1035,315" shape="poly">-->
-<!--    <area target="" alt="Plass_id_12" title="Plass_id_12" href="" coords="1038,330,1108,325,1133,412,1054,414" shape="poly">-->
-<!--    <area target="" alt="Plass_id_13" title="Plass_id_13" href="" coords="1249,232,1312,224,1347,297,1276,300" shape="poly">-->
-<!--    <area target="" alt="Plass_id_14" title="Plass_id_14" href="" coords="1287,322,1358,316,1399,398,1323,403" shape="poly">-->
-<!--    <area target="" alt="Plass_id_15" title="Plass_id_15" href="" coords="1339,231,1396,220,1442,290,1374,296" shape="poly">-->
-<!--    <area target="" alt="Plass_id_16" title="Plass_id_16" href="" coords="1385,315,1453,307,1504,391,1426,394" shape="poly">-->
-<!--</map>-->
-<img src="static/floorplan.png" alt="Floor Plan">
-    <a class="clickable-area" target="" href="" title="Plass_id_1" alt="Plass_id_1" shape="poly" coords="275,344,196,347,232,271,302,268"></a>
-<a class="clickable-area" href="" title="Plass_id_2" alt="Plass_id_2" shape="poly" coords="134,455,183,363,256,363,218,452"></a>
-<a class="clickable-area" href="" title="Plass_id_3" alt="Plass_id_3" shape="poly" coords="390,266,325,266,286,347,365,342"></a>
-<a class="clickable-area" href="" title="Plass_id_4" alt="Plass_id_4" shape="poly" coords="354,357,283,360,240,449,327,449"></a>
-<a class="clickable-area" href="" title="Plass_id_5" alt="Plass_id_5" shape="poly" coords="590,258,650,252,641,328,571,334"></a>
-<a class="clickable-area" href="" title="Plass_id_6" alt="Plass_id_6" shape="poly" coords="563,349,631,347,625,433,546,439"></a>
-<a class="clickable-area" href="" title="Plass_id_7" alt="Plass_id_7" shape="poly" coords="679,258,747,255,745,326,669,326"></a>
-<a class="clickable-area" href="" title="Plass_id_8" alt="Plass_id_8" shape="poly" coords="669,344,739,338,734,428,658,428"></a>
-<a class="clickable-area" href="" title="Plass_id_9" alt="Plass_id_9" shape="poly" coords="929,244,986,239,1005,315,935,317"></a>
-<a class="clickable-area" href="" title="Plass_id_10" alt="Plass_id_10" shape="poly" coords="940,334,1005,334,1021,421,945,421"></a>
-<a class="clickable-area" href="" title="Plass_id_11" alt="Plass_id_11" shape="poly" coords="1024,239,1084,236,1105,310,1035,315"></a>
-<a class="clickable-area" href="" title="Plass_id_12" alt="Plass_id_12" shape="poly" coords="1038,330,1108,325,1133,412,1054,414"></a>
-<a class="clickable-area" href="" title="Plass_id_13" alt="Plass_id_13" shape="poly" coords="1249,232,1312,224,1347,297,1276,300"></a>
-<a class="clickable-area" href="" title="Plass_id_14" alt="Plass_id_14" shape="poly" coords="1287,322,1358,316,1399,398,1323,403"></a>
-<a class="clickable-area" href="" title="Plass_id_15" alt="Plass_id_15" shape="poly" coords="1339,231,1396,220,1442,290,1374,296"></a>
-<a class="clickable-area"  href="" title="Plass_id_16" alt="Plass_id_16" shape="poly" coords="1385,315,1453,307,1504,391,1426,394"></a>
+<div style="position: relative; display: block; margin: auto; text-align: center">
+
+
+
+<svg version="1.2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 283 868" width="283" height="868">
+	<title>Plasser</title>
+	<a href="" title="Plass 1">
+	<g id="Plass_id_1">
+			<g id="Bord_1">
+			<path id="Layer" class="s0" d="m55 44h90v50h-90z"/>
+			<path id="Layer" class="s1" d="m55 44h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m55 87h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m135 44h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m135 87h10v7h-10z"/>
+		</g>
+		<g id="Stol_1">
+			<path id="Layer" class="s0" d="m116.4 21.3l3 24.1c0.6 3.5-1 7-4 9-10.2 1.6-20.6 1.6-30.9 0-2.9-2-4.5-5.5-3.9-9l3-24.1c0.5-2.7 3.4-4.7 6.9-5h19c3.5 0.3 6.4 2.3 6.9 5z"/>
+			<path id="Layer" class="s0" d="m115.7 15.8c0.8 0.3 1.2 1.3 1 2.2-0.3 0.9-1.2 1.4-2 1.1-9.9-2.4-20.1-2.4-29.9 0-0.6-0.2-1.1-0.7-1.3-1.4-0.3-0.6-0.1-1.4 0.3-1.9 10.5-2.8 21.4-2.8 31.9 0z"/>
+		</g>
+				<g id="Skap_1">
+			<path id="Layer" fill-rule="evenodd" class="s2" d="m20.1 37h32.9v51.5l-10.6 10.5v-51.5h-32.4v51.5h32.4v-51.5h-32.4z"/>
+			<path id="Layer" class="s3" d="m2 37z"/>
+			<path id="Layer" class="s3" d="m10.5 63.3h31.9"/>
+			<path id="Layer" class="s3" d="m22.2 54.9h9"/>
+			<path id="Layer" class="s3" d="m34.9 58v-6.3h-16.4v6.3z"/>
+			<path id="Layer" class="s3" d="m22.2 88h9"/>
+			<path id="Layer" class="s3" d="m34.9 91.1v-6.8h-16.4v6.8z"/>
+			<path id="Layer" class="s3" d="m10.5 95.3h31.9"/>
+			<path id="Layer" class="s2" d="m34.9 86.4l7.5-6.9v-12h-33l-7.4 7.3h32.9z"/>
+			<path id="Layer" class="s4" d="m34.9 74.8l7.5-7.3"/>
+			<path id="Layer" class="s5" d="m34.9 86.4h-32.9v-16.3h32.9z"/>
+			<path id="Layer" class="s3" d="m14.8 78.5h9"/>
+			<path id="Layer" class="s3" d="m27.5 81.7v-6.3h-16.5v6.3z"/>
+			<path id="Layer" class="s3" d="m42.2 48l10.8-11"/>
+		</g>
+
+
+		<g id="Layer">
+			<path id="Layer" class="s0" d="m80 86.5h40v-35h-40z"/>
+			<path id="Layer" class="s1" d="m82 85h36v-11h-36z"/>
+			<path id="Layer" class="s1" d="m81.5 70.5h37v-12.5h-37z"/>
+			<path id="Layer" class="s1" d="m96 56.5h8v-4h-8z"/>
+			<path id="Layer" class="s1" d="m80 72.5h40m-38.5-4.5h37m-37-2.5h37m-37-2.5h37m-24.5-2.5v-2.5m12 2.5v-2.5m-24.5 2.5h37"/>
+		</g>
+	</g>
+
+</a>
+
+
+
+
+
+<a href="" title="Plass 2">
+	<g id="Plass_id_2">
+				<g id="Bord_2">
+			<path id="Layer" class="s0" d="m172 44h90v50h-90z"/>
+			<path id="Layer" class="s1" d="m172 44h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m172 87h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m252 44h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m252 87h10v7h-10z"/>
+		</g>
+			<g id="Stol_2">
+			<path id="Layer" class="s0" d="m233.4 21.3l3 24.1c0.6 3.5-1 7-4 9-10.2 1.6-20.6 1.6-30.8 0-3-2-4.6-5.5-4-9l3-24.1c0.5-2.7 3.4-4.7 6.9-5h19c3.5 0.3 6.4 2.3 6.9 5z"/>
+			<path id="Layer" class="s0" d="m232.7 15.8c0.8 0.3 1.2 1.3 1 2.2-0.3 0.9-1.2 1.4-2 1.1-9.9-2.4-20.1-2.4-29.9 0-0.6-0.2-1.1-0.7-1.3-1.4-0.2-0.6-0.1-1.4 0.3-1.9 10.5-2.8 21.4-2.8 31.9 0z"/>
+		</g>
+				<g id="Vindu">
+			<path id="Layer" class="s0" d="m282 1v200h-10v-200z"/>
+			<path id="Layer" class="s1" d="m277 1v200"/>
+		</g>
+
+
+		<g id="Layer">
+			<path id="Layer" class="s0" d="m197 86.5h40v-35h-40z"/>
+			<path id="Layer" class="s1" d="m199 85h36v-11h-36z"/>
+			<path id="Layer" class="s1" d="m198.5 70.5h37v-12.5h-37z"/>
+			<path id="Layer" class="s1" d="m213 56.5h8v-4h-8z"/>
+			<path id="Layer" class="s1" d="m197 72.5h40m-38.5-4.5h37m-37-2.5h37m-37-2.5h37m-24.5-2.5v-2.5m12 2.5v-2.5m-24.5 2.5h37"/>
+		</g>
+	</g>
+</a>
+
+	<a href="" title="Plass 3">
+	<g id="Plass_id_3">
+		<g id="Bord_3">
+			<path id="Layer" class="s0" d="m55 113h90v50h-90z"/>
+			<path id="Layer" class="s1" d="m55 113h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m55 156h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m135 113h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m135 156h10v7h-10z"/>
+		</g>
+		<g id="Skap_3">
+			<path id="Layer" fill-rule="evenodd" class="s2" d="m20.1 106h32.9v51.5l-10.6 10.5v-51.5h-32.4v51.5h32.4v-51.5h-32.4z"/>
+			<path id="Layer" class="s3" d="m2 106z"/>
+			<path id="Layer" class="s3" d="m10.5 132.3h31.9"/>
+			<path id="Layer" class="s3" d="m22.2 123.9h9"/>
+			<path id="Layer" class="s3" d="m34.9 127v-6.3h-16.4v6.3z"/>
+			<path id="Layer" class="s3" d="m22.2 157h9"/>
+			<path id="Layer" class="s3" d="m34.9 160.1v-6.8h-16.4v6.8z"/>
+			<path id="Layer" class="s3" d="m10.5 164.3h31.9"/>
+			<path id="Layer" class="s2" d="m34.9 155.4l7.5-6.8v-12.1h-33l-7.4 7.3h32.9z"/>
+			<path id="Layer" class="s4" d="m34.9 143.8l7.5-7.3"/>
+			<path id="Layer" class="s5" d="m34.9 155.4h-32.9v-16.3h32.9z"/>
+			<path id="Layer" class="s3" d="m14.8 147.5h9"/>
+			<path id="Layer" class="s3" d="m27.5 150.7v-6.3h-16.5v6.3z"/>
+			<path id="Layer" class="s3" d="m42.2 117l10.8-11"/>
+		</g>
+		<g id="Stol_3">
+			<path id="Layer" class="s0" d="m116.4 190.2l3-24.1c0.6-3.5-1-7-4-9-10.2-1.6-20.6-1.6-30.9 0-2.9 2-4.5 5.5-3.9 9l3 24.1c0.5 2.7 3.4 4.7 6.9 5h19c3.5-0.3 6.4-2.3 6.9-5z"/>
+			<path id="Layer" class="s0" d="m115.7 195.7c0.8-0.3 1.2-1.3 1-2.2-0.3-0.9-1.2-1.4-2-1.1-9.9 2.4-20.1 2.4-29.9 0-0.6 0.2-1.1 0.7-1.3 1.4-0.3 0.6-0.1 1.4 0.3 1.9 10.5 2.8 21.4 2.8 31.9 0z"/>
+		</g>
+
+		<g id="Layer">
+			<path id="Layer" class="s0" d="m80 155.5h40v-35h-40z"/>
+			<path id="Layer" class="s1" d="m82 154h36v-11h-36z"/>
+			<path id="Layer" class="s1" d="m81.5 139.5h37v-12.5h-37z"/>
+			<path id="Layer" class="s1" d="m96 125.5h8v-4h-8z"/>
+			<path id="Layer" class="s1" d="m80 141.5h40m-38.5-4.5h37m-37-2.5h37m-37-2.5h37m-24.5-2.5v-2.5m12 2.5v-2.5m-24.5 2.5h37"/>
+		</g>
+	</g>
+	</a>
+		<a href="" title="Plass 4">
+		<g id="Plass_id_4">
+					<g id="Bord_4">
+			<path id="Layer" class="s0" d="m172 113h90v50h-90z"/>
+			<path id="Layer" class="s1" d="m172 113h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m172 156h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m252 113h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m252 156h10v7h-10z"/>
+		</g>
+		<g id="Stol_4">
+			<path id="Layer" class="s0" d="m233.4 190.2l3-24.1c0.6-3.5-1-7-4-9-10.2-1.6-20.6-1.6-30.8 0-3 2-4.6 5.5-4 9l3 24.1c0.5 2.7 3.4 4.7 6.9 5h19c3.5-0.3 6.4-2.3 6.9-5z"/>
+			<path id="Layer" class="s0" d="m232.7 195.7c0.8-0.3 1.2-1.3 1-2.2-0.3-0.9-1.2-1.4-2-1.1-9.9 2.4-20.1 2.4-29.9 0-0.6 0.2-1.1 0.7-1.3 1.4-0.2 0.6-0.1 1.4 0.3 1.9 10.5 2.8 21.4 2.8 31.9 0z"/>
+		</g>
+
+		<g id="Layer">
+			<path id="Layer" class="s0" d="m197 155.5h40v-35h-40z"/>
+			<path id="Layer" class="s1" d="m199 154h36v-11h-36z"/>
+			<path id="Layer" class="s1" d="m198.5 139.5h37v-12.5h-37z"/>
+			<path id="Layer" class="s1" d="m213 125.5h8v-4h-8z"/>
+			<path id="Layer" class="s1" d="m197 141.5h40m-38.5-4.5h37m-37-2.5h37m-37-2.5h37m-24.5-2.5v-2.5m12 2.5v-2.5m-24.5 2.5h37"/>
+		</g>
+		</g>
+		</a>
+	<a href="" title="Plass 5">
+	<g id="Plass_id_5">
+				<g id="Bord_5">
+			<path id="Layer" class="s0" d="m55 266h90v50h-90z"/>
+			<path id="Layer" class="s1" d="m55 266h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m55 309h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m135 266h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m135 309h10v7h-10z"/>
+		</g>
+			<g id="Stol_5">
+			<path id="Layer" class="s0" d="m116.4 243.3l3 24.1c0.6 3.5-1 7-4 9-10.2 1.6-20.6 1.6-30.9 0-2.9-2-4.5-5.5-3.9-9l3-24.1c0.5-2.7 3.4-4.7 6.9-5h19c3.5 0.3 6.4 2.3 6.9 5z"/>
+			<path id="Layer" class="s0" d="m115.7 237.8c0.8 0.3 1.2 1.3 1 2.2-0.3 0.9-1.2 1.4-2 1.1-9.9-2.4-20.1-2.4-29.9 0-0.6-0.2-1.1-0.7-1.3-1.4-0.3-0.6-0.1-1.4 0.3-1.9 10.5-2.8 21.4-2.8 31.9 0z"/>
+		</g>
+				<g id="Skap_5">
+			<path id="Layer" fill-rule="evenodd" class="s2" d="m20.1 259h32.9v51.5l-10.6 10.5v-51.5h-32.4v51.5h32.4v-51.5h-32.4z"/>
+			<path id="Layer" class="s3" d="m2 259z"/>
+			<path id="Layer" class="s3" d="m10.5 285.3h31.9"/>
+			<path id="Layer" class="s3" d="m22.2 276.9h9"/>
+			<path id="Layer" class="s3" d="m34.9 280v-6.3h-16.4v6.3z"/>
+			<path id="Layer" class="s3" d="m22.2 310h9"/>
+			<path id="Layer" class="s3" d="m34.9 313.1v-6.8h-16.4v6.8z"/>
+			<path id="Layer" class="s3" d="m10.5 317.3h31.9"/>
+			<path id="Layer" class="s2" d="m34.9 308.4l7.5-6.8v-12.1h-33l-7.4 7.3h32.9z"/>
+			<path id="Layer" class="s4" d="m34.9 296.8l7.5-7.3"/>
+			<path id="Layer" class="s5" d="m34.9 308.4h-32.9v-16.3h32.9z"/>
+			<path id="Layer" class="s3" d="m14.8 300.5h9"/>
+			<path id="Layer" class="s3" d="m27.5 303.7v-6.3h-16.5v6.3z"/>
+			<path id="Layer" class="s3" d="m42.2 270l10.8-11"/>
+		</g>
+
+
+
+		<g id="Pc_5">
+			<path id="Layer" class="s0" d="m80 308.5h40v-35h-40z"/>
+			<path id="Layer" class="s1" d="m82 307h36v-11h-36z"/>
+			<path id="Layer" class="s1" d="m81.5 292.5h37v-12.5h-37z"/>
+			<path id="Layer" class="s1" d="m96 278.5h8v-4h-8z"/>
+			<path id="Layer" class="s1" d="m80 294.5h40m-38.5-4.5h37m-37-2.5h37m-37-2.5h37m-24.5-2.5v-2.5m12 2.5v-2.5m-24.5 2.5h37"/>
+		</g>
+
+	</g>
+	</a>
+
+	<a href="" title="Plass 6">
+		<g id="Plass_id_6">
+					<g id="Bord_6">
+			<path id="Layer" class="s0" d="m172 266h90v50h-90z"/>
+			<path id="Layer" class="s1" d="m172 266h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m172 309h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m252 266h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m252 309h10v7h-10z"/>
+		</g>
+				<g id="Stol_6">
+			<path id="Layer" class="s0" d="m233.4 243.3l3 24.1c0.6 3.5-1 7-4 9-10.2 1.6-20.6 1.6-30.8 0-3-2-4.6-5.5-4-9l3-24.1c0.5-2.7 3.4-4.7 6.9-5h19c3.5 0.3 6.4 2.3 6.9 5z"/>
+			<path id="Layer" class="s0" d="m232.7 237.8c0.8 0.3 1.2 1.3 1 2.2-0.3 0.9-1.2 1.4-2 1.1-9.9-2.4-20.1-2.4-29.9 0-0.6-0.2-1.1-0.7-1.3-1.4-0.2-0.6-0.1-1.4 0.3-1.9 10.5-2.8 21.4-2.8 31.9 0z"/>
+		</g>
+
+		<g id="pc_6">
+			<path id="Layer" class="s0" d="m197 308.5h40v-35h-40z"/>
+			<path id="Layer" class="s1" d="m199 307h36v-11h-36z"/>
+			<path id="Layer" class="s1" d="m198.5 292.5h37v-12.5h-37z"/>
+			<path id="Layer" class="s1" d="m213 278.5h8v-4h-8z"/>
+			<path id="Layer" class="s1" d="m197 294.5h40m-38.5-4.5h37m-37-2.5h37m-37-2.5h37m-24.5-2.5v-2.5m12 2.5v-2.5m-24.5 2.5h37"/>
+		</g>
+
+		<g id="Vindu_6">
+			<path id="Layer" class="s0" d="m282 223v200h-10v-200z"/>
+			<path id="Layer" class="s1" d="m277 223v200"/>
+		</g>
+		</g>
+</a>
+		<a href="" title="Plass 7">
+			<g id="Plass_id_7">
+						<g id="Bord_7">
+			<path id="Layer" class="s0" d="m55 335h90v50h-90z"/>
+			<path id="Layer" class="s1" d="m55 335h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m55 378h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m135 335h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m135 378h10v7h-10z"/>
+		</g>
+		<g id="Stol_7">
+			<path id="Layer" class="s0" d="m116.4 412.2l3-24.1c0.6-3.5-1-7-4-9-10.2-1.6-20.6-1.6-30.9 0-2.9 2-4.5 5.5-3.9 9l3 24.1c0.5 2.7 3.4 4.7 6.9 5h19c3.5-0.3 6.4-2.3 6.9-5z"/>
+			<path id="Layer" class="s0" d="m115.7 417.7c0.8-0.3 1.2-1.3 1-2.2-0.3-0.9-1.2-1.4-2-1.1-9.9 2.4-20.1 2.4-29.9 0-0.6 0.2-1.1 0.7-1.3 1.4-0.3 0.6-0.1 1.4 0.3 1.9 10.5 2.8 21.4 2.8 31.9 0z"/>
+		</g>
+
+		<g id="Pc_7">
+			<path id="Layer" class="s0" d="m80 377.5h40v-35h-40z"/>
+			<path id="Layer" class="s1" d="m82 376h36v-11h-36z"/>
+			<path id="Layer" class="s1" d="m81.5 361.5h37v-12.5h-37z"/>
+			<path id="Layer" class="s1" d="m96 347.5h8v-4h-8z"/>
+			<path id="Layer" class="s1" d="m80 363.5h40m-38.5-4.5h37m-37-2.5h37m-37-2.5h37m-24.5-2.5v-2.5m12 2.5v-2.5m-24.5 2.5h37"/>
+		</g>
+						<g id="Skap_7">
+			<path id="Layer" fill-rule="evenodd" class="s2" d="m20.1 328h32.9v51.5l-10.6 10.5v-51.5h-32.4v51.5h32.4v-51.5h-32.4z"/>
+			<path id="Layer" class="s3" d="m2 328z"/>
+			<path id="Layer" class="s3" d="m10.5 354.3h31.9"/>
+			<path id="Layer" class="s3" d="m22.2 345.9h9"/>
+			<path id="Layer" class="s3" d="m34.9 349v-6.3h-16.4v6.3z"/>
+			<path id="Layer" class="s3" d="m22.2 379h9"/>
+			<path id="Layer" class="s3" d="m34.9 382.1v-6.8h-16.4v6.8z"/>
+			<path id="Layer" class="s3" d="m10.5 386.3h31.9"/>
+			<path id="Layer" class="s2" d="m34.9 377.4l7.5-6.8v-12.1h-33l-7.4 7.3h32.9z"/>
+			<path id="Layer" class="s4" d="m34.9 365.8l7.5-7.3"/>
+			<path id="Layer" class="s5" d="m34.9 377.4h-32.9v-16.3h32.9z"/>
+			<path id="Layer" class="s3" d="m14.8 369.5h9"/>
+			<path id="Layer" class="s3" d="m27.5 372.7v-6.3h-16.5v6.3z"/>
+			<path id="Layer" class="s3" d="m42.2 339l10.8-11"/>
+		</g>
+			</g>
+		</a>
+
+			<a href="" title="Plass 8">
+			<g id="Plass_id_8">
+						<g id="Bord_8">
+			<path id="Layer" class="s0" d="m172 335h90v50h-90z"/>
+			<path id="Layer" class="s1" d="m172 335h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m172 378h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m252 335h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m252 378h10v7h-10z"/>
+		</g>
+		<g id="Stol_8">
+			<path id="Layer" class="s0" d="m233.4 412.2l3-24.1c0.6-3.5-1-7-4-9-10.2-1.6-20.6-1.6-30.8 0-3 2-4.6 5.5-4 9l3 24.1c0.5 2.7 3.4 4.7 6.9 5h19c3.5-0.3 6.4-2.3 6.9-5z"/>
+			<path id="Layer" class="s0" d="m232.7 417.7c0.8-0.3 1.2-1.3 1-2.2-0.3-0.9-1.2-1.4-2-1.1-9.9 2.4-20.1 2.4-29.9 0-0.6 0.2-1.1 0.7-1.3 1.4-0.2 0.6-0.1 1.4 0.3 1.9 10.5 2.8 21.4 2.8 31.9 0z"/>
+		</g>
+
+		<g id="Pc_8">
+			<path id="Layer" class="s0" d="m197 377.5h40v-35h-40z"/>
+			<path id="Layer" class="s1" d="m199 376h36v-11h-36z"/>
+			<path id="Layer" class="s1" d="m198.5 361.5h37v-12.5h-37z"/>
+			<path id="Layer" class="s1" d="m213 347.5h8v-4h-8z"/>
+			<path id="Layer" class="s1" d="m197 363.5h40m-38.5-4.5h37m-37-2.5h37m-37-2.5h37m-24.5-2.5v-2.5m12 2.5v-2.5m-24.5 2.5h37"/>
+		</g>
+				</g>
+			</a>
+
+				<a href="" title="Plass 9">
+			<g id="Plass_id_9">
+						<g id="Bord_9">
+			<path id="Layer" class="s0" d="m55 488h90v50h-90z"/>
+			<path id="Layer" class="s1" d="m55 488h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m55 531h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m135 488h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m135 531h10v7h-10z"/>
+		</g>
+		<g id="Stol_9">
+			<path id="Layer" class="s0" d="m116.4 465.3l3 24.1c0.6 3.5-1 7-4 9-10.2 1.6-20.6 1.6-30.9 0-2.9-2-4.5-5.5-3.9-9l3-24.1c0.5-2.7 3.4-4.7 6.9-5h19c3.5 0.3 6.4 2.3 6.9 5z"/>
+			<path id="Layer" class="s0" d="m115.7 459.8c0.8 0.3 1.2 1.3 1 2.2-0.3 0.9-1.2 1.4-2 1.1-9.9-2.4-20.1-2.4-29.9 0-0.6-0.2-1.1-0.7-1.3-1.4-0.3-0.6-0.1-1.4 0.3-1.9 10.5-2.8 21.4-2.8 31.9 0z"/>
+		</g>
+
+		<g id="Pc_9">
+			<path id="Layer" class="s0" d="m80 530.5h40v-35h-40z"/>
+			<path id="Layer" class="s1" d="m82 529h36v-11h-36z"/>
+			<path id="Layer" class="s1" d="m81.5 514.5h37v-12.5h-37z"/>
+			<path id="Layer" class="s1" d="m96 500.5h8v-4h-8z"/>
+			<path id="Layer" class="s1" d="m80 516.5h40m-38.5-4.5h37m-37-2.5h37m-37-2.5h37m-24.5-2.5v-2.5m12 2.5v-2.5m-24.5 2.5h37"/>
+		</g>
+						<g id="Skap_9">
+			<path id="Layer" fill-rule="evenodd" class="s2" d="m20.1 481h32.9v51.5l-10.6 10.5v-51.5h-32.4v51.5h32.4v-51.5h-32.4z"/>
+			<path id="Layer" class="s3" d="m2 481z"/>
+			<path id="Layer" class="s3" d="m10.5 507.3h31.9"/>
+			<path id="Layer" class="s3" d="m22.2 498.9h9"/>
+			<path id="Layer" class="s3" d="m34.9 502v-6.3h-16.4v6.3z"/>
+			<path id="Layer" class="s3" d="m22.2 532h9"/>
+			<path id="Layer" class="s3" d="m34.9 535.1v-6.8h-16.4v6.8z"/>
+			<path id="Layer" class="s3" d="m10.5 539.3h31.9"/>
+			<path id="Layer" class="s2" d="m34.9 530.4l7.5-6.9v-12h-33l-7.4 7.3h32.9z"/>
+			<path id="Layer" class="s4" d="m34.9 518.8l7.5-7.3"/>
+			<path id="Layer" class="s5" d="m34.9 530.4h-32.9v-16.3h32.9z"/>
+			<path id="Layer" class="s3" d="m14.8 522.5h9"/>
+			<path id="Layer" class="s3" d="m27.5 525.7v-6.3h-16.5v6.3z"/>
+			<path id="Layer" class="s3" d="m42.2 492l10.8-11"/>
+		</g>
+
+			</g>
+				</a>
+
+					<a href="" title="Plass 10">
+			<g id="Plass_id_10">
+						<g id="Bord_10">
+			<path id="Layer" class="s0" d="m172 488h90v50h-90z"/>
+			<path id="Layer" class="s1" d="m172 488h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m172 531h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m252 488h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m252 531h10v7h-10z"/>
+		</g>
+		<g id="Stol_10">
+			<path id="Layer" class="s0" d="m233.4 465.3l3 24.1c0.6 3.5-1 7-4 9-10.2 1.6-20.6 1.6-30.8 0-3-2-4.6-5.5-4-9l3-24.1c0.5-2.7 3.4-4.7 6.9-5h19c3.5 0.3 6.4 2.3 6.9 5z"/>
+			<path id="Layer" class="s0" d="m232.7 459.8c0.8 0.3 1.2 1.3 1 2.2-0.3 0.9-1.2 1.4-2 1.1-9.9-2.4-20.1-2.4-29.9 0-0.6-0.2-1.1-0.7-1.3-1.4-0.2-0.6-0.1-1.4 0.3-1.9 10.5-2.8 21.4-2.8 31.9 0z"/>
+		</g>
+
+		<g id="Pc_10">
+			<path id="Layer" class="s0" d="m197 530.5h40v-35h-40z"/>
+			<path id="Layer" class="s1" d="m199 529h36v-11h-36z"/>
+			<path id="Layer" class="s1" d="m198.5 514.5h37v-12.5h-37z"/>
+			<path id="Layer" class="s1" d="m213 500.5h8v-4h-8z"/>
+			<path id="Layer" class="s1" d="m197 516.5h40m-38.5-4.5h37m-37-2.5h37m-37-2.5h37m-24.5-2.5v-2.5m12 2.5v-2.5m-24.5 2.5h37"/>
+		</g>
+
+			</g>
+					</a>
+
+						<a href="" title="Plass 11">
+			<g id="Plass_id_11">
+						<g id="Bord_11">
+			<path id="Layer" class="s0" d="m55 557h90v50h-90z"/>
+			<path id="Layer" class="s1" d="m55 557h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m55 600h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m135 557h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m135 600h10v7h-10z"/>
+		</g>
+						<g id="Stol_11">
+			<path id="Layer" class="s0" d="m116.4 634.2l3-24.1c0.6-3.5-1-7-4-9-10.2-1.6-20.6-1.6-30.9 0-2.9 2-4.5 5.5-3.9 9l3 24.1c0.5 2.7 3.4 4.7 6.9 5h19c3.5-0.3 6.4-2.3 6.9-5z"/>
+			<path id="Layer" class="s0" d="m115.7 639.7c0.8-0.3 1.2-1.3 1-2.2-0.3-0.9-1.2-1.4-2-1.1-9.9 2.4-20.1 2.4-29.9 0-0.6 0.1-1.1 0.7-1.3 1.3-0.3 0.7-0.1 1.5 0.3 2 10.5 2.8 21.4 2.8 31.9 0z"/>
+		</g>
+		<g id="Vindu_11">
+			<path id="Layer" class="s0" d="m282 445v200h-10v-200z"/>
+			<path id="Layer" class="s1" d="m277 445v200"/>
+		</g>
+
+
+		<g id="Pc_11">
+			<path id="Layer" class="s0" d="m80 599.5h40v-35h-40z"/>
+			<path id="Layer" class="s1" d="m82 598h36v-11h-36z"/>
+			<path id="Layer" class="s1" d="m81.5 583.5h37v-12.5h-37z"/>
+			<path id="Layer" class="s1" d="m96 569.5h8v-4h-8z"/>
+			<path id="Layer" class="s1" d="m80 585.5h40m-38.5-4.5h37m-37-2.5h37m-37-2.5h37m-24.5-2.5v-2.5m12 2.5v-2.5m-24.5 2.5h37"/>
+		</g>
+						<g id="Skap_11">
+			<path id="Layer" fill-rule="evenodd" class="s2" d="m20.1 550h32.9v51.5l-10.6 10.5v-51.5h-32.4v51.5h32.4v-51.5h-32.4z"/>
+			<path id="Layer" class="s3" d="m2 550z"/>
+			<path id="Layer" class="s3" d="m10.5 576.3h31.9"/>
+			<path id="Layer" class="s3" d="m22.2 567.9h9"/>
+			<path id="Layer" class="s3" d="m34.9 571v-6.3h-16.4v6.3z"/>
+			<path id="Layer" class="s3" d="m22.2 601h9"/>
+			<path id="Layer" class="s3" d="m34.9 604.1v-6.8h-16.4v6.8z"/>
+			<path id="Layer" class="s3" d="m10.5 608.3h31.9"/>
+			<path id="Layer" class="s2" d="m34.9 599.4l7.5-6.9v-12h-33l-7.4 7.3h32.9z"/>
+			<path id="Layer" class="s4" d="m34.9 587.8l7.5-7.3"/>
+			<path id="Layer" class="s5" d="m34.9 599.4h-32.9v-16.3h32.9z"/>
+			<path id="Layer" class="s3" d="m14.8 591.5h9"/>
+			<path id="Layer" class="s3" d="m27.5 594.7v-6.3h-16.5v6.3z"/>
+			<path id="Layer" class="s3" d="m42.2 561l10.8-11"/>
+		</g>
+			</g>
+						</a>
+
+						<a href="" title="Plass 12">
+			<g id="Plass_id_12">
+						<g id="Bord_12">
+			<path id="Layer" class="s0" d="m172 557h90v50h-90z"/>
+			<path id="Layer" class="s1" d="m172 557h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m172 600h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m252 557h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m252 600h10v7h-10z"/>
+		</g>
+
+		<g id="Stol_12">
+			<path id="Layer" class="s0" d="m233.4 634.2l3-24.1c0.6-3.5-1-7-4-9-10.2-1.6-20.6-1.6-30.8 0-3 2-4.6 5.5-4 9l3 24.1c0.5 2.7 3.4 4.7 6.9 5h19c3.5-0.3 6.4-2.3 6.9-5z"/>
+			<path id="Layer" class="s0" d="m232.7 639.7c0.8-0.3 1.2-1.3 1-2.2-0.3-0.9-1.2-1.4-2-1.1-9.9 2.4-20.1 2.4-29.9 0-0.6 0.1-1.1 0.7-1.3 1.3-0.2 0.7-0.1 1.5 0.3 2 10.5 2.8 21.4 2.8 31.9 0z"/>
+		</g>
+
+		<g id="Pc_12">
+			<path id="Layer" class="s0" d="m197 599.5h40v-35h-40z"/>
+			<path id="Layer" class="s1" d="m199 598h36v-11h-36z"/>
+			<path id="Layer" class="s1" d="m198.5 583.5h37v-12.5h-37z"/>
+			<path id="Layer" class="s1" d="m213 569.5h8v-4h-8z"/>
+			<path id="Layer" class="s1" d="m197 585.5h40m-38.5-4.5h37m-37-2.5h37m-37-2.5h37m-24.5-2.5v-2.5m12 2.5v-2.5m-24.5 2.5h37"/>
+		</g>
+			</g>
+						</a>
+
+						<a href="" title="Plass 13">
+			<g id="Plass_id_13">
+						<g id="Bord_13">
+			<path id="Layer" class="s0" d="m55 710h90v50h-90z"/>
+			<path id="Layer" class="s1" d="m55 710h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m55 753h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m135 710h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m135 753h10v7h-10z"/>
+		</g>
+		<g id="Stol_13">
+			<path id="Layer" class="s0" d="m116.4 687.3l3 24.1c0.6 3.5-1 7-4 9-10.2 1.6-20.6 1.6-30.9 0-2.9-2-4.5-5.5-3.9-9l3-24.1c0.5-2.7 3.4-4.7 6.9-5h19c3.5 0.3 6.4 2.3 6.9 5z"/>
+			<path id="Layer" class="s0" d="m115.7 681.8c0.8 0.3 1.2 1.3 1 2.2-0.3 0.9-1.2 1.4-2 1.1-9.9-2.4-20.1-2.4-29.9 0-0.6-0.1-1.1-0.7-1.3-1.3-0.3-0.7-0.1-1.5 0.3-2 10.5-2.8 21.4-2.8 31.9 0z"/>
+		</g>
+
+		<g id="Pc_13">
+			<path id="Layer" class="s0" d="m80 752.5h40v-35h-40z"/>
+			<path id="Layer" class="s1" d="m82 751h36v-11h-36z"/>
+			<path id="Layer" class="s1" d="m81.5 736.5h37v-12.5h-37z"/>
+			<path id="Layer" class="s1" d="m96 722.5h8v-4h-8z"/>
+			<path id="Layer" class="s1" d="m80 738.5h40m-38.5-4.5h37m-37-2.5h37m-37-2.5h37m-24.5-2.5v-2.5m12 2.5v-2.5m-24.5 2.5h37"/>
+		</g>
+					<g id="Skap_13">
+			<path id="Layer" fill-rule="evenodd" class="s2" d="m20.1 703h32.9v51.5l-10.6 10.5v-51.5h-32.4v51.5h32.4v-51.5h-32.4z"/>
+			<path id="Layer" class="s3" d="m2 703z"/>
+			<path id="Layer" class="s3" d="m10.5 729.3h31.9"/>
+			<path id="Layer" class="s3" d="m22.2 720.9h9"/>
+			<path id="Layer" class="s3" d="m34.9 724v-6.3h-16.4v6.3z"/>
+			<path id="Layer" class="s3" d="m22.2 754h9"/>
+			<path id="Layer" class="s3" d="m34.9 757.1v-6.8h-16.4v6.8z"/>
+			<path id="Layer" class="s3" d="m10.5 761.3h31.9"/>
+			<path id="Layer" class="s2" d="m34.9 752.4l7.5-6.9v-12h-33l-7.4 7.3h32.9z"/>
+			<path id="Layer" class="s4" d="m34.9 740.8l7.5-7.3"/>
+			<path id="Layer" class="s5" d="m34.9 752.4h-32.9v-16.3h32.9z"/>
+			<path id="Layer" class="s3" d="m14.8 744.5h9"/>
+			<path id="Layer" class="s3" d="m27.5 747.7v-6.3h-16.5v6.3z"/>
+			<path id="Layer" class="s3" d="m42.2 714l10.8-11"/>
+		</g>
+				</g>
+						</a>
+
+
+						<a href="" title="Plass 14">
+			<g id="Plass_id_14">
+						<g id="Bord_14">
+			<path id="Layer" class="s0" d="m172 710h90v50h-90z"/>
+			<path id="Layer" class="s1" d="m172 710h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m172 753h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m252 710h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m252 753h10v7h-10z"/>
+		</g>
+		<g id="Stol_14">
+			<path id="Layer" class="s0" d="m233.4 687.3l3 24.1c0.6 3.5-1 7-4 9-10.2 1.6-20.6 1.6-30.8 0-3-2-4.6-5.5-4-9l3-24.1c0.5-2.7 3.4-4.7 6.9-5h19c3.5 0.3 6.4 2.3 6.9 5z"/>
+			<path id="Layer" class="s0" d="m232.7 681.8c0.8 0.3 1.2 1.3 1 2.2-0.3 0.9-1.2 1.4-2 1.1-9.9-2.4-20.1-2.4-29.9 0-0.6-0.1-1.1-0.7-1.3-1.3-0.2-0.7-0.1-1.5 0.3-2 10.5-2.8 21.4-2.8 31.9 0z"/>
+		</g>
+
+
+
+		<g id="Pc_14">
+			<path id="Layer" class="s0" d="m197 752.5h40v-35h-40z"/>
+			<path id="Layer" class="s1" d="m199 751h36v-11h-36z"/>
+			<path id="Layer" class="s1" d="m198.5 736.5h37v-12.5h-37z"/>
+			<path id="Layer" class="s1" d="m213 722.5h8v-4h-8z"/>
+			<path id="Layer" class="s1" d="m197 738.5h40m-38.5-4.5h37m-37-2.5h37m-37-2.5h37m-24.5-2.5v-2.5m12 2.5v-2.5m-24.5 2.5h37"/>
+		</g>
+
+		<g id="Vindu_14">
+			<path id="Layer" class="s0" d="m282 667v200h-10v-200z"/>
+			<path id="Layer" class="s1" d="m277 667v200"/>
+		</g>
+				</g>
+						</a>
+
+							<a href="" title="Plass 15" >
+			<g id="Plass_id_15">
+						<g id="Bord_15">
+
+			<path id="Layer" class="s0" d="m55 779h90v50h-90z"/>
+			<path id="Layer" class="s1" d="m55 779h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m55 822h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m135 779h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m135 822h10v7h-10z"/>
+		</g>
+		<g id="Stol_15">
+			<path id="Layer" class="s0" d="m116.4 856.2l3-24.1c0.6-3.5-1-7-4-9-10.2-1.6-20.6-1.6-30.9 0-2.9 2-4.5 5.5-3.9 9l3 24.1c0.5 2.7 3.4 4.7 6.9 5h19c3.5-0.3 6.4-2.3 6.9-5z"/>
+			<path id="Layer" class="s0" d="m115.7 861.7c0.8-0.3 1.2-1.3 1-2.2-0.3-0.9-1.2-1.4-2-1.1-9.9 2.4-20.1 2.4-29.9 0-0.6 0.1-1.1 0.7-1.3 1.3-0.3 0.7-0.1 1.5 0.3 2 10.5 2.8 21.4 2.8 31.9 0z"/>
+		</g>
+
+		<g id="Pc_15">
+			<path id="Layer" class="s0" d="m80 821.5h40v-35h-40z"/>
+			<path id="Layer" class="s1" d="m82 820h36v-11h-36z"/>
+			<path id="Layer" class="s1" d="m81.5 805.5h37v-12.5h-37z"/>
+			<path id="Layer" class="s1" d="m96 791.5h8v-4h-8z"/>
+			<path id="Layer" class="s1" d="m80 807.5h40m-38.5-4.5h37m-37-2.5h37m-37-2.5h37m-24.5-2.5v-2.5m12 2.5v-2.5m-24.5 2.5h37"/>
+		</g>
+						<g id="Skap_15">
+			<path id="Layer" fill-rule="evenodd" class="s2" d="m20.1 772h32.9v51.5l-10.6 10.5v-51.5h-32.4v51.5h32.4v-51.5h-32.4z"/>
+			<path id="Layer" class="s3" d="m2 772z"/>
+			<path id="Layer" class="s3" d="m10.5 798.3h31.9"/>
+			<path id="Layer" class="s3" d="m22.2 789.9h9"/>
+			<path id="Layer" class="s3" d="m34.9 793v-6.3h-16.4v6.3z"/>
+			<path id="Layer" class="s3" d="m22.2 823h9"/>
+			<path id="Layer" class="s3" d="m34.9 826.1v-6.8h-16.4v6.8z"/>
+			<path id="Layer" class="s3" d="m10.5 830.3h31.9"/>
+			<path id="Layer" class="s2" d="m34.9 821.4l7.5-6.9v-12h-33l-7.4 7.3h32.9z"/>
+			<path id="Layer" class="s4" d="m34.9 809.8l7.5-7.3"/>
+			<path id="Layer" class="s5" d="m34.9 821.4h-32.9v-16.3h32.9z"/>
+			<path id="Layer" class="s3" d="m14.8 813.5h9"/>
+			<path id="Layer" class="s3" d="m27.5 816.7v-6.3h-16.5v6.3z"/>
+			<path id="Layer" class="s3" d="m42.2 783l10.8-11"/>
+		</g>
+
+			</g>
+							</a>
+
+								<a href="" title="Plass 16">
+
+
+			<g id="Plass_id_16">
+		<g id="Bord_16">
+
+			<path id="Layer" class="s0" d="m172 779h90v50h-90z"/>
+			<path id="Layer" class="s1" d="m172 779h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m172 822h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m252 779h10v7h-10z"/>
+			<path id="Layer" class="s1" d="m252 822h10v7h-10z"/>
+
+		</g>
+
+		<g id="Stol_16">
+
+			<path id="Layer" class="s0" d="m233.4 856.2l3-24.1c0.6-3.5-1-7-4-9-10.2-1.6-20.6-1.6-30.8 0-3 2-4.6 5.5-4 9l3 24.1c0.5 2.7 3.4 4.7 6.9 5h19c3.5-0.3 6.4-2.3 6.9-5z"/>
+			<path id="Layer" class="s0" d="m232.7 861.7c0.8-0.3 1.2-1.3 1-2.2-0.3-0.9-1.2-1.4-2-1.1-9.9 2.4-20.1 2.4-29.9 0-0.6 0.1-1.1 0.7-1.3 1.3-0.2 0.7-0.1 1.5 0.3 2 10.5 2.8 21.4 2.8 31.9 0z"/>
+		</g>
+
+		<g id="Pc_16">
+
+			<path id="Layer" class="s0" d="m197 821.5h40v-35h-40z"/>
+			<path id="Layer" class="s1" d="m199 820h36v-11h-36z"/>
+			<path id="Layer" class="s1" d="m198.5 805.5h37v-12.5h-37z"/>
+			<path id="Layer" class="s1" d="m213 791.5h8v-4h-8z"/>
+			<path id="Layer" class="s1" d="m197 807.5h40m-38.5-4.5h37m-37-2.5h37m-37-2.5h37m-24.5-2.5v-2.5m12 2.5v-2.5m-24.5 2.5h37"/>
+		</g>
+
+	</g>
+								</a>
+</svg>
+
+
+
+	<script>
+
+var oppttate_plasser = {{ oppttate_plasser|tojson }};
+
+oppttate_plasser.forEach(function(plass) {
+  var plass_id = plass['plass_id'];
+  var bruker_id = plass['bruker_id'];
+  var bookings_dato = plass['bookings_dato'];
+
+  // select the SVG element with the corresponding id
+  var svg_element = d3.select('#Plass_id_' + plass_id);
+
+  // get the bounding box of the path element
+  var bbox = svg_element.select('path').node().getBBox();
+
+  // calculate the center point of the bounding box
+  var centerX = bbox.x + bbox.width / 2;
+  var centerY = bbox.y + bbox.height / 2;
+
+  // add the text element as a child of the selected SVG element
+  svg_element.append('text')
+    .attr('x', centerX)
+    .attr('y', centerY)
+    .attr('dy', '.35em')
+    .attr('text-anchor', 'middle')
+    .text(bruker_id)
+    .style('fill', 'white')
+    .style('font-size', '20px');
+});
+
+</script>
+
+<script>
+
+
+const paths = document.querySelectorAll('[id^="Plass_id_"]');
+paths.forEach(path => {
+  path.addEventListener('click', function(event) {
+    event.preventDefault();
+    const computedStyle = window.getComputedStyle(path);
+    if (computedStyle.getPropertyValue('fill') !== 'red') {
+      paths.forEach(p => p.classList.remove('selected'));
+      path.classList.add('selected');
+      path.style.fill = 'red';
+    }
+  });
+});
+
+</script>
+
+<!--	<script>-->
+<!--		const textBox = document.querySelector("input[placeholder='Valgt Plass']");-->
+<!--for (let i = 0; i < paths.length; i++) {-->
+<!--  paths[i].addEventListener("click", function(event) {-->
+<!--    event.preventDefault();-->
+<!--    if (this.getAttribute("fill") !== "red") {-->
+<!--      textBox.value = this.getAttribute("id").substring(9);-->
+<!--    }-->
+<!--  });-->
+<!--}-->
+
+<!--	</script>-->
+
+<script>
+var oppttate_plasser = {{ oppttate_plasser|tojson }};
+const pathsx = document.querySelectorAll("[id^='Plass_id_']");
+const textbox = document.querySelector("input[placeholder='Valgt Plass']");
+
+for (let i = 0; i < pathsx.length; i++) {
+  pathsx[i].addEventListener("click", function(event) {
+    const id = this.getAttribute("id").replace("Plass_id_", "");
+    if (this.getAttribute("fill") !== "red" && !oppttate_plasser.some(p => p.plass_id === id)) {
+      event.preventDefault();
+      textbox.value = "";
+      textbox.value += id + " ";
+    }
+  });
+}
+
+</script>
+
+
+
+	<script>
+
+const datoInput = document.querySelector("input[placeholder='Valgt Dato']");
+const navLinks = document.querySelectorAll(".nav-item.nav-link");
+
+for (let i = 0; i < navLinks.length; i++) {
+  navLinks[i].addEventListener("click", function(event) {
+    event.preventDefault();
+    const dato = this.textContent.split(" ")[1];
+    datoInput.value = dato;
+  });
+}
+
+
+	</script>
+
+
+
 
 
 
 </div>
 
-
-
-    <br>
-<script>
-function showActiveBooked() {
-  // Get the active link element
-  const activeLink = document.getElementById('active-link');
-
-  // Get the value of the data-dato attribute
-  const dato = activeLink.getAttribute('data-dato');
-
-  // Call the show_booked function with the dato value
-  show_booked(dato);
-}
-
-// Get all the nav links
-const navLinks = document.querySelectorAll('.nav-link');
-
-// Add event listener to each nav link
-navLinks.forEach(link => {
-  link.addEventListener('click', function() {
-    // Remove "active" class from all links
-    navLinks.forEach(link => link.classList.remove('active'));
-
-    // Add "active" class to the clicked link
-    this.classList.add('active');
-
-
-  });
-});
-
-
-function getCookie(name) {
-  const cookieValue = document.cookie.match('(^|[^;]+)\\s*' + name + '\\s*=\\s*([^;]+)');
-  return cookieValue ? cookieValue.pop() : '';
-}
-
-
-
-function check_cookie() {
-  const name = getCookie("navn");
-  if (name != "") {
-    // The cookie exists, so you can do something with the name here
-    return name
-  } else {
-    // The cookie doesn't exist, so you can show the popup and set the cookie
-    const popup_name = prompt("Book plass under navnet:");
-    if (popup_name != "" && popup_name != null) {
-      document.cookie = "navn=" + popup_name + "; expires=Fri, 31 Dec 9999 23:59:59 GMT"; // Set the cookie to never expire
-
-    }
-  }
-}
-
-
-
-function show_booked(dato) {
-    console.log(dato);
-    return fetch('/show_booked', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ 'dato': dato })
-    })
-    .then(response => response.json())
-    .then(result => {
-        // Remove the highlight class from all clickable areas
-        const clickableAreas = document.getElementsByClassName("clickable-area");
-        for (let i = 0; i < clickableAreas.length; i++) {
-            clickableAreas[i].classList.remove("highlight");
-            clickableAreas[i].textContent = "";
-        }
-
-        // Apply the highlight class to the corresponding clickable areas
-        for (let i = 0; i < result.length; i++) {
-            const plassId = result[i].plass_id;
-            const brukerId = result[i].bruker_id;
-            const clickableArea = document.querySelector(`[title="Plass_id_${plassId}"]`);
-            clickableArea.classList.add("highlight");
-            const span = document.createElement("span");
-            span.innerHTML = brukerId;
-            span.style.position = "absolute";
-            span.style.top = "50%";
-            span.style.left = "50%";
-            span.style.transform = "translate(-50%, -50%)";
-            clickableArea.appendChild(span);
-        }
-
-        // Return the dato variable
-        return dato;
-    });
-}
-
-
-const clickableAreas = document.getElementsByClassName("clickable-area");
-for (let i = 0; i < clickableAreas.length; i++) {
-  let clickedAreaId = null;
-  clickableAreas[i].addEventListener("click", function() {
-    if (!clickableAreas[i].classList.contains("highlight")) {
-      console.log("HEI")
-      const cookieResult = check_cookie();
-      clickedAreaId = clickableAreas[i].id;
-      const activeNavLink = document.querySelector('.nav-link.active');
-      const booke_dato = activeNavLink.getAttribute('data-dato');
-
-      console.log(cookieResult, clickedAreaId,booke_dato);
-      book(cookieResult, clickedAreaId, booke_dato);
-
-    }
-  });
-}
-
-
-function book(cookieResult, clickedAreaId, booke_dato) {
-  fetch('/book', {
-    method: 'POST',
-    body: JSON.stringify({ 'cookie_result': cookieResult, 'clicked_area_id': clickedAreaId, 'booke_dato': booke_dato}),
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  })
-  .then(response => {
-    if (response.ok) {
-      location.reload();
-    } else {
-      return response.json();
-    }
-  })
-  .then(data => console.log(data))
-  .catch(error => console.error(error));
-}
-
-</script>
-
 </body>
+
 </html>
