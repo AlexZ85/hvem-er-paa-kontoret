@@ -9,20 +9,7 @@
 	<script src="https://d3js.org/d3.v7.min.js"></script>
 
 
-<style>
-  {% for plass in oppttate_plasser %}
 
-    #Plass_id_{{ plass.plass_id }} path  {
-      fill: red;
-    }
-
-  {% endfor %}
-
-	.selected path {
-    fill: blue;
-  }
-
-</style>
 <!--    <script>-->
 <!--       $(document).ready(function(){-->
 <!--  $(".nav-link").click(function(){-->
@@ -42,7 +29,6 @@
     });
   });
 </script>
-
 </head>
 
 <body style="background-color: #343a40 ">
@@ -56,14 +42,14 @@
             <div class="collapse navbar-collapse" id="navbarCollapse1">
                 <div class="navbar-nav">
                     {% for dag, dato in ukedager.items() %}
-                    <a href="#" class="nav-item nav-link ">{{ dag }} {{ dato }}</a>
+                    <a href="#" class="nav-item nav-link " onclick="show_booked('{{ dato }}')">{{ dag }} {{ dato }}</a>
                      {% endfor %}
 
                 </div>
-                <form class="d-flex ms-auto">
-                    <input type="text" class="form-control me-sm-2" placeholder="Navn" required>
-                    <input class="form-control" readonly type="text" placeholder="Valgt Plass" style="background-color: gray">
-					<input class="form-control" readonly type="text" placeholder="Valgt Dato" style="background-color: gray">
+  <form class="d-flex ms-auto" method="POST" action="/book">
+                    <input type="text" name="navn" class="form-control me-sm-2" placeholder="Navn" required>
+                    <input class="form-control" name="plass_id" readonly type="text" placeholder="Valgt Plass" style="background-color: gray">
+					<input class="form-control" name="dato" readonly type="text" placeholder="Valgt Dato" style="background-color: gray">
                     <button type="submit" class="btn btn-outline-light">Book</button>
                 </form>
             </div>
@@ -81,7 +67,6 @@
 		.s3 { fill: none;stroke: #ffffff;stroke-width: 2 }
 		.s4 { fill: none;stroke: #ffffff;stroke-linejoin: round;stroke-width: 2 }
 		.s5 { fill: #036897;stroke: #ffffff;stroke-width: 2 }
-
 
 
 
@@ -652,51 +637,10 @@
 
 	<script>
 
-var oppttate_plasser = {{ oppttate_plasser|tojson }};
-
-oppttate_plasser.forEach(function(plass) {
-  var plass_id = plass['plass_id'];
-  var bruker_id = plass['bruker_id'];
-  var bookings_dato = plass['bookings_dato'];
-
-  // select the SVG element with the corresponding id
-  var svg_element = d3.select('#Plass_id_' + plass_id);
-
-  // get the bounding box of the path element
-  var bbox = svg_element.select('path').node().getBBox();
-
-  // calculate the center point of the bounding box
-  var centerX = bbox.x + bbox.width / 2;
-  var centerY = bbox.y + bbox.height / 2;
-
-  // add the text element as a child of the selected SVG element
-  svg_element.append('text')
-    .attr('x', centerX)
-    .attr('y', centerY)
-    .attr('dy', '.35em')
-    .attr('text-anchor', 'middle')
-    .text(bruker_id)
-    .style('fill', 'white')
-    .style('font-size', '20px');
-});
 
 </script>
 
 <script>
-
-
-const paths = document.querySelectorAll('[id^="Plass_id_"]');
-paths.forEach(path => {
-  path.addEventListener('click', function(event) {
-    event.preventDefault();
-    const computedStyle = window.getComputedStyle(path);
-    if (computedStyle.getPropertyValue('fill') !== 'red') {
-      paths.forEach(p => p.classList.remove('selected'));
-      path.classList.add('selected');
-      path.style.fill = 'red';
-    }
-  });
-});
 
 </script>
 
@@ -713,41 +657,146 @@ paths.forEach(path => {
 
 <!--	</script>-->
 
-<script>
-var oppttate_plasser = {{ oppttate_plasser|tojson }};
-const pathsx = document.querySelectorAll("[id^='Plass_id_']");
-const textbox = document.querySelector("input[placeholder='Valgt Plass']");
 
-for (let i = 0; i < pathsx.length; i++) {
-  pathsx[i].addEventListener("click", function(event) {
-    const id = this.getAttribute("id").replace("Plass_id_", "");
-    if (this.getAttribute("fill") !== "red" && !oppttate_plasser.some(p => p.plass_id === id)) {
-      event.preventDefault();
-      textbox.value = "";
-      textbox.value += id + " ";
-    }
-  });
-}
+<script>
+
+
 
 </script>
-
-
-
 	<script>
 
-const datoInput = document.querySelector("input[placeholder='Valgt Dato']");
-const navLinks = document.querySelectorAll(".nav-item.nav-link");
+{% if oppttate_plasser %}
+  var oppttate_plasser = {{ oppttate_plasser|tojson }};
+  addBookingLabels(oppttate_plasser);
+   generateStyles();
+{% endif %}
 
-for (let i = 0; i < navLinks.length; i++) {
-  navLinks[i].addEventListener("click", function(event) {
-    event.preventDefault();
-    const dato = this.textContent.split(" ")[1];
-    datoInput.value = dato;
+function applyStyles() {
+  var oppttate_plasser = {{ oppttate_plasser|tojson }};
+  if (oppttate_plasser && oppttate_plasser.length > 0) {
+    var styles = generateStyles(oppttate_plasser);
+    console.log(styles); // check the generated styles in the console
+    var head = document.head || document.getElementsByTagName('head')[0];
+    var style = document.createElement('style');
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode(styles));
+    head.appendChild(style);
+  }
+}
+
+function addBookingLabels(oppttate_plasser) {
+  oppttate_plasser.forEach(function(plass) {
+    var plass_id = plass['plass_id'];
+    var bruker_id = plass['bruker_id'];
+    var bookings_dato = plass['bookings_dato'];
+
+    // select the SVG element with the corresponding id
+    var svg_element = d3.select('#Plass_id_' + plass_id);
+
+    // get the bounding box of the path element
+    var bbox = svg_element.select('path').node().getBBox();
+
+    // calculate the center point of the bounding box
+    var centerX = bbox.x + bbox.width / 2;
+    var centerY = bbox.y + bbox.height / 2;
+
+    // add the text element as a child of the selected SVG element
+    svg_element.append('text')
+      .attr('x', centerX)
+      .attr('y', centerY)
+      .attr('dy', '.35em')
+      .attr('text-anchor', 'middle')
+      .text(bruker_id)
+      .style('fill', 'white')
+      .style('font-size', '20px');
+  });
+}
+
+function addClickHandlerToPaths() {
+  const paths = document.querySelectorAll('[id^="Plass_id_"]');
+  paths.forEach(path => {
+    path.addEventListener('click', function(event) {
+      event.preventDefault();
+      const computedStyle = window.getComputedStyle(path);
+      if (computedStyle.getPropertyValue('fill') !== 'red') {
+        paths.forEach(p => p.classList.remove('selected'));
+        path.classList.add('selected');
+        path.style.fill = 'red';
+      }
+    });
   });
 }
 
 
-	</script>
+function addClickEventToPaths(oppttate_plasser) {
+  const pathsx = document.querySelectorAll("[id^='Plass_id_']");
+  const textbox = document.querySelector("input[placeholder='Valgt Plass']");
+
+  for (let i = 0; i < pathsx.length; i++) {
+    pathsx[i].addEventListener("click", function(event) {
+      const id = this.getAttribute("id").replace("Plass_id_", "");
+      if (this.getAttribute("fill") !== "red" && !oppttate_plasser.some(p => p.plass_id === id)) {
+        event.preventDefault();
+        textbox.value = "";
+        textbox.value += id + " ";
+      }
+    });
+  }
+}
+
+
+function show_booked(dato) {
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", "/show_booked");
+  xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      var opptatte_plasser = JSON.parse(xhr.responseText);
+      if (opptatte_plasser.length > 0) {
+        applyStyles();
+      }
+    } else {
+      console.log("Request failed. Returned status of " + xhr.status);
+    }
+  };
+  xhr.send(JSON.stringify({"dato": dato}));
+}
+
+
+
+
+function addNavLinksEventListener() {
+  const datoInput = document.querySelector("input[placeholder='Valgt Dato']");
+  const navLinks = document.querySelectorAll(".nav-item.nav-link");
+
+  for (let i = 0; i < navLinks.length; i++) {
+    navLinks[i].addEventListener("click", function(event) {
+      event.preventDefault();
+      const dato = this.textContent.split(" ")[1];
+      datoInput.value = dato;
+    });
+  }
+}
+
+function generateStyles(oppttate_plasser) {
+  let styles = '';
+  for (const plass of oppttate_plasser) {
+    const { plass_id } = plass;
+    styles += `#Plass_id_${plass_id} path { fill: red; }`;
+  }
+  styles += `.selected path { fill: blue; }`;
+  return styles;
+}
+
+// call applyStyles() after generateStyles()
+var oppttate_plasser = {{ oppttate_plasser|tojson }};
+if (oppttate_plasser && oppttate_plasser.length > 0) {
+  applyStyles();
+}
+
+
+
+</script>
 
 
 

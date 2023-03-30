@@ -1,7 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired
+
 
 import datetime as dt
 from datetime import datetime as datetime
@@ -11,6 +9,7 @@ import locale
 from sqlalchemy import create_engine, text
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = '123'
 
 
 
@@ -49,10 +48,27 @@ today_formated = today.strftime("%d-%m-%Y")
 
 
 @app.route("/")
-def load_booked_plasser(dato=today_formated):
+def index():
+    return render_template('home.html', oppttate_plasser=db.load_plasser_from_db(), ukedager=list_weekday_dates())
 
-    return render_template('home.html', oppttate_plasser=db.load_plasser_from_db(dato), ukedager=list_weekday_dates() )
+@app.route('/book', methods=['POST'])
+def book():
+    navn = request.form['navn']
+    booket_plass = request.form['plass_id']
+    booket_dato = request.form['dato']
+    # process the form data as needed
+    db.book_plass(navn,booket_plass,booket_dato)
+    return db.book_plass(navn,booket_plass,booket_dato)
+
+
+@app.route('/show_booked', methods=['POST'])
+def vis_booked():
+    dato = request.json['dato']
+    oppttate_plasser=db.load_plasser_from_db(dato)
+    return jsonify(oppttate_plasser)
+
 
 
 if __name__ == "__main__":
+    print(__name__)
     app.run(host='0.0.0.0', debug=True)
