@@ -23,17 +23,12 @@
   }
 
 </style>
-<!--    <script>-->
-<!--       $(document).ready(function(){-->
-<!--  $(".nav-link").click(function(){-->
-<!--    $(".nav-link").removeClass("active"); // remove active class from all buttons-->
-<!--    $(this).addClass("active"); // add active class to the clicked button-->
-<!--  });-->
-<!--});-->
 
-<!--    </script>-->
 
 	<script>
+
+
+
 $(document).ready(function() {
   const paths = $('[id^="Plass_id_"]');
   const datoInput = $("input[placeholder='Valgt Dato']");
@@ -133,15 +128,15 @@ for (let i = 0; i < pathsx.length; i++) {
   });
 });
 
-
-
-
-
-
-
-
-
-
+function validateForm() {
+    var plass = document.getElementById("Plass").value;
+    var dato = document.getElementById("Dato").value;
+    if (plass == "" || dato == "") {
+        alert("Du har ikke valgt dag/plass");
+        return false;
+    }
+    return true;
+}
 
 
 </script>
@@ -149,6 +144,13 @@ for (let i = 0; i < pathsx.length; i++) {
 </head>
 
 <body style="background-color: #343a40 ">
+{% if popup %}
+  <div class="alert alert-{{ popup.status }}" >
+    {{ popup.message }}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+{% endif %}
+
 <div class="m-4">
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
@@ -163,12 +165,12 @@ for (let i = 0; i < pathsx.length; i++) {
                      {% endfor %}
 
                 </div>
-                <form class="d-flex ms-auto">
-                    <input type="text" class="form-control me-sm-2" placeholder="Navn" required>
-                    <input class="form-control" readonly type="text" id="plass" placeholder="Valgt Plass" style="background-color: gray">
-					<input class="form-control" readonly type="text" id="Dato" placeholder="Valgt Dato" style="background-color: gray">
-                    <button type="submit" class="btn btn-outline-light" >Book</button>
-                </form>
+<form class="d-flex ms-auto" method="POST" action="/book" onsubmit="return validateForm()">
+    <input type="text" class="form-control me-sm-2" id="Navn" name="Navn" placeholder="Navn" required>
+    <input class="form-control" readonly type="text" id="Plass" name="Plass" placeholder="Valgt Plass" style="background-color: gray">
+    <input class="form-control" readonly type="text" id="Dato" name="Dato"  placeholder="Valgt Dato" style="background-color: gray">
+    <button type="submit" class="btn btn-outline-light">Book</button>
+</form>
             </div>
         </div>
     </nav>

@@ -55,10 +55,19 @@ def load_booked_plasser():
 
 
 @app.route('/hent_bookings', methods=['POST'])
-def my_flask_function():
+def hent_bookings():
     dato = request.form.get('dato')
     booket_plasser = db.load_plasser_from_db(dato)
     return jsonify(booket_plasser)
+
+
+@app.route('/book', methods=['POST'])
+def book():
+    navn = request.form.get('Navn')
+    plass = request.form.get('Plass')
+    dato = request.form.get('Dato')
+    return render_template('home.html',popup=db.book_plass(navn, plass, dato),ukedager=list_weekday_dates())
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True)

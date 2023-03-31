@@ -24,3 +24,28 @@ def load_plasser_from_db(dato):
         plasser = data_list
         print(plasser)
         return plasser
+
+def book_plass(navn, booket_plass, booket_dato):
+    # check if there are any existing bookings with the same plass_id and bookings_dato
+    query = text("""
+    SELECT count(*) as count
+    FROM paakontoret.bookings
+    WHERE plass_id = :plass_id AND bookings_dato = :bookings_dato
+    """)
+    with engine.connect() as conn:
+        result = conn.execute(query, {"plass_id": booket_plass, "bookings_dato": booket_dato})
+        count = result.fetchone()[0]
+
+        if count > 0:
+            feil_popup = {'message': 'Plassen var allerede booket!','status': 'danger'}
+            return feil_popup
+        else:
+            # insert the new booking
+            query = text("""
+            INSERT INTO paakontoret.bookings (plass_id, bruker_id, bookings_dato)
+            VALUES (:plass_id, :bruker_id, :bookings_dato)
+            """)
+            result = conn.execute(query, {"plass_id": booket_plass, "bruker_id": navn, "bookings_dato": booket_dato})
+            print(f"{result.rowcount} rows inserted")
+            ok_popup = {'message': 'Plassen er booket!','status': 'success'}
+            return ok_popup
