@@ -34,13 +34,116 @@
 <!--    </script>-->
 
 	<script>
-  $(document).ready(function() {
-    $(".nav-link").eq(0).addClass("active"); // add active class to the first nav-link element
-    $(".nav-link").click(function() {
-      $(".nav-link").removeClass("active"); // remove active class from all buttons
-      $(this).addClass("active"); // add active class to the clicked button
+$(document).ready(function() {
+  const paths = $('[id^="Plass_id_"]');
+  const datoInput = $("input[placeholder='Valgt Dato']");
+  const navLinks = $(".nav-item.nav-link");
+
+  paths.click(function(event) {
+    event.preventDefault();
+    const computedStyle = window.getComputedStyle(this);
+    if (computedStyle.getPropertyValue('fill') !== 'red') {
+      paths.removeClass('selected');
+      $(this).addClass('selected');
+      $(this).css('fill', 'red');
+    }
+  });
+
+  navLinks.on("click", function(event) {
+    event.preventDefault();
+    const dato = $(this).text().trim().split(" ")[1];
+    datoInput.val(dato);
+  });
+
+  $(".nav-link").click(function() {
+    $(".nav-link").removeClass("active"); // remove active class from all buttons
+    $(this).addClass("active"); // add active class to the clicked button
+  });
+});
+
+
+//kaller funksjon når man klikker på menyen
+$(document).ready(function() {
+  $('.nav-link').click(function(event) {
+    event.preventDefault();
+    var dato = $(this).text().trim().split(" ")[1];
+    $.ajax({
+      url: '/hent_bookings',
+      type: 'POST',
+      dataType: 'json',
+      data: {'dato': dato},
+      success: function(data) {
+  console.log(data);
+
+
+  var oppttate_plasser = data;
+const pathsx = document.querySelectorAll("[id^='Plass_id_']");
+const textbox = document.querySelector("input[placeholder='Valgt Plass']");
+
+for (let i = 0; i < pathsx.length; i++) {
+  pathsx[i].addEventListener("click", function(event) {
+    const id = this.getAttribute("id").replace("Plass_id_", "");
+    if (this.getAttribute("fill") !== "red" && !oppttate_plasser.some(p => p.plass_id === id)) {
+      event.preventDefault();
+      textbox.value = "";
+      textbox.value += id + " ";
+    }
+  });
+}
+
+
+
+  var booketPlasser = data.booket_plasser;
+
+  var styleId = 'plass-styles';
+  $('#' + styleId).remove(); // remove the previous style element if it exists
+  $('[id^="Plass_id_"] text').remove(); // remove previous text elements
+
+  var style = $('<style></style>');  // create a new style element
+  style.attr('id', styleId); // give it an ID
+  $('head').append(style);  // append it to the head element
+
+  for (var i = 0; i < data.length; i++) {
+    var plassId = data[i].plass_id.trim();
+    var pathSelector = '#Plass_id_' + plassId + ' path';
+    style.append(pathSelector + ' { fill: red; }');  // add the style rule to the style element
+
+    // add text element for bruker_id
+    var bruker_id = data[i]['bruker_id'];
+    var bookings_dato = data[i]['bookings_dato'];
+    var svg_element = d3.select('#Plass_id_' + plassId);
+    var bbox = svg_element.select('path').node().getBBox();
+    var centerX = bbox.x + bbox.width / 2;
+    var centerY = bbox.y + bbox.height / 2;
+    svg_element.append('text')
+      .attr('x', centerX)
+      .attr('y', centerY)
+      .attr('dy', '.35em')
+      .attr('text-anchor', 'middle')
+      .text(bruker_id)
+      .style('fill', 'white')
+      .style('font-size', '20px');
+  }
+},
+
+      error: function(error) {
+        console.error(error);
+      }
     });
   });
+});
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
 
 </head>
@@ -56,15 +159,15 @@
             <div class="collapse navbar-collapse" id="navbarCollapse1">
                 <div class="navbar-nav">
                     {% for dag, dato in ukedager.items() %}
-                    <a href="#" class="nav-item nav-link ">{{ dag }} {{ dato }}</a>
+                    <a href="#" class="nav-item nav-link" id="mein_knapp">{{ dag }} {{ dato }}</a>
                      {% endfor %}
 
                 </div>
                 <form class="d-flex ms-auto">
                     <input type="text" class="form-control me-sm-2" placeholder="Navn" required>
-                    <input class="form-control" readonly type="text" placeholder="Valgt Plass" style="background-color: gray">
-					<input class="form-control" readonly type="text" placeholder="Valgt Dato" style="background-color: gray">
-                    <button type="submit" class="btn btn-outline-light">Book</button>
+                    <input class="form-control" readonly type="text" id="plass" placeholder="Valgt Plass" style="background-color: gray">
+					<input class="form-control" readonly type="text" id="Dato" placeholder="Valgt Dato" style="background-color: gray">
+                    <button type="submit" class="btn btn-outline-light" >Book</button>
                 </form>
             </div>
         </div>
@@ -649,106 +752,10 @@
 </svg>
 
 
-
-	<script>
-
-var oppttate_plasser = {{ oppttate_plasser|tojson }};
-
-oppttate_plasser.forEach(function(plass) {
-  var plass_id = plass['plass_id'];
-  var bruker_id = plass['bruker_id'];
-  var bookings_dato = plass['bookings_dato'];
-
-  // select the SVG element with the corresponding id
-  var svg_element = d3.select('#Plass_id_' + plass_id);
-
-  // get the bounding box of the path element
-  var bbox = svg_element.select('path').node().getBBox();
-
-  // calculate the center point of the bounding box
-  var centerX = bbox.x + bbox.width / 2;
-  var centerY = bbox.y + bbox.height / 2;
-
-  // add the text element as a child of the selected SVG element
-  svg_element.append('text')
-    .attr('x', centerX)
-    .attr('y', centerY)
-    .attr('dy', '.35em')
-    .attr('text-anchor', 'middle')
-    .text(bruker_id)
-    .style('fill', 'white')
-    .style('font-size', '20px');
-});
-
-</script>
-
 <script>
 
 
-const paths = document.querySelectorAll('[id^="Plass_id_"]');
-paths.forEach(path => {
-  path.addEventListener('click', function(event) {
-    event.preventDefault();
-    const computedStyle = window.getComputedStyle(path);
-    if (computedStyle.getPropertyValue('fill') !== 'red') {
-      paths.forEach(p => p.classList.remove('selected'));
-      path.classList.add('selected');
-      path.style.fill = 'red';
-    }
-  });
-});
-
 </script>
-
-<!--	<script>-->
-<!--		const textBox = document.querySelector("input[placeholder='Valgt Plass']");-->
-<!--for (let i = 0; i < paths.length; i++) {-->
-<!--  paths[i].addEventListener("click", function(event) {-->
-<!--    event.preventDefault();-->
-<!--    if (this.getAttribute("fill") !== "red") {-->
-<!--      textBox.value = this.getAttribute("id").substring(9);-->
-<!--    }-->
-<!--  });-->
-<!--}-->
-
-<!--	</script>-->
-
-<script>
-var oppttate_plasser = {{ oppttate_plasser|tojson }};
-const pathsx = document.querySelectorAll("[id^='Plass_id_']");
-const textbox = document.querySelector("input[placeholder='Valgt Plass']");
-
-for (let i = 0; i < pathsx.length; i++) {
-  pathsx[i].addEventListener("click", function(event) {
-    const id = this.getAttribute("id").replace("Plass_id_", "");
-    if (this.getAttribute("fill") !== "red" && !oppttate_plasser.some(p => p.plass_id === id)) {
-      event.preventDefault();
-      textbox.value = "";
-      textbox.value += id + " ";
-    }
-  });
-}
-
-</script>
-
-
-
-	<script>
-
-const datoInput = document.querySelector("input[placeholder='Valgt Dato']");
-const navLinks = document.querySelectorAll(".nav-item.nav-link");
-
-for (let i = 0; i < navLinks.length; i++) {
-  navLinks[i].addEventListener("click", function(event) {
-    event.preventDefault();
-    const dato = this.textContent.split(" ")[1];
-    datoInput.value = dato;
-  });
-}
-
-
-	</script>
-
 
 
 

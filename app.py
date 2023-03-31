@@ -29,9 +29,10 @@ def list_weekday_dates():
 
     # Define a dictionary to store the weekday dates
     weekday_dates = {}
-
+    weekday_dates.update({current_date.strftime("%A"): current_date.strftime("%d-%m-%Y")})
     # Iterate over the next 4 days
     for i in range(1, 7):
+
         # Add the current day to the date offset by i days
         dato = current_date + dt.timedelta(days=i)
 
@@ -49,10 +50,15 @@ today_formated = today.strftime("%d-%m-%Y")
 
 
 @app.route("/")
-def load_booked_plasser(dato=today_formated):
+def load_booked_plasser():
+    return render_template('home.html', ukedager=list_weekday_dates() )
 
-    return render_template('home.html', oppttate_plasser=db.load_plasser_from_db(dato), ukedager=list_weekday_dates() )
 
+@app.route('/hent_bookings', methods=['POST'])
+def my_flask_function():
+    dato = request.form.get('dato')
+    booket_plasser = db.load_plasser_from_db(dato)
+    return jsonify(booket_plasser)
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', debug=True)
