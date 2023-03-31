@@ -1,13 +1,7 @@
 from flask import Flask, render_template, request, jsonify
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired
-
 import datetime as dt
 from datetime import datetime as datetime
-import routes as routes
 import database as db
-import locale
 from sqlalchemy import create_engine, text
 
 app = Flask(__name__)
