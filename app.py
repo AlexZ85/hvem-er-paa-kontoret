@@ -38,11 +38,6 @@ def list_weekday_dates():
     # Print the dictionary of weekday dates
     return weekday_dates
 
-
-today = datetime.today()
-today_formated = today.strftime("%d-%m-%Y")
-
-
 @app.route("/")
 def load_booked_plasser():
     return render_template('home.html', ukedager=list_weekday_dates() )
