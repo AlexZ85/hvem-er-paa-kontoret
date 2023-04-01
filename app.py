@@ -4,7 +4,7 @@ from datetime import datetime as datetime
 import database as db
 from sqlalchemy import create_engine, text
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='./styles')
 
 
 

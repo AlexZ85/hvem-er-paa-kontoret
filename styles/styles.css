@@ -1,0 +1,74 @@
+body {
+    font-size: 1px;
+}
+form input[type="text"] {
+    width: 20%;
+    margin-right: 10px;
+}
+
+  {% for plass in oppttate_plasser %}
+
+    #Plass_id_{{ plass.plass_id }} path  {
+      fill: red;
+    }
+
+  {% endfor %}
+
+	.selected path {
+    fill: blue;
+  }
+
+/* CSS for mobile devices */
+
+/* Set the font size to 16px */
+html {
+  font-size: 16px;
+}
+
+/* Set the navbar to collapse on smaller screens */
+.navbar-collapse {
+  flex-basis: 100%;
+  flex-grow: 1;
+}
+
+/* Reduce the size of the navbar brand */
+.navbar-brand {
+  font-size: 1.5rem;
+}
+
+/* Reduce the size of the nav items */
+.nav-link {
+  font-size: 1rem;
+}
+
+/* Add margin to the nav items */
+.nav-link:not(:last-child) {
+  margin-right: 0.5rem;
+}
+
+/* Reduce the font size of the form inputs */
+.form-control {
+  font-size: 1rem;
+}
+
+/* Add margin to the form inputs */
+.form-control:not(:last-child) {
+  margin-right: 0.5rem;
+}
+
+/* Reduce the font size of the form button */
+.btn {
+  font-size: 1rem;
+}
+
+ /* Style the circle element in the SVG */
+
+  		.s0 { fill: #ffffff;stroke: #000000 }
+		.s1 { fill: none;stroke: #000000 }
+		.s2 { fill: #036897;stroke: #ffffff;stroke-linejoin: round;stroke-width: 2 }
+		.s3 { fill: none;stroke: #ffffff;stroke-width: 2 }
+		.s4 { fill: none;stroke: #ffffff;stroke-linejoin: round;stroke-width: 2 }
+		.s5 { fill: #036897;stroke: #ffffff;stroke-width: 2 }
+
+
+
