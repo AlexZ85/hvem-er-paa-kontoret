@@ -10,6 +10,14 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+@media (max-width: 767px) {
+  /* Styles for screens below 767px wide (mobile screens) */
+  input[type="text"] {
+    font-size: 1.2rem; /* Increase the font size of the input fields */
+    padding: 0.4rem; /* Decrease the padding of the input fields */
+  }
+}
+
   {% for plass in oppttate_plasser %}
 
     #Plass_id_{{ plass.plass_id }} path  {
@@ -22,61 +30,33 @@
     fill: blue;
   }
 
-/* CSS for mobile devices */
 
-/* Set the font size to 16px */
-html {
-  font-size: 16px;
-}
+   .dropdown-menu {
+        background-color: #343a40;
+    }
 
-/* Set the navbar to collapse on smaller screens */
-.navbar-collapse {
-  flex-basis: 100%;
-  flex-grow: 1;
-}
-
-/* Reduce the size of the navbar brand */
-.navbar-brand {
-  font-size: 1.5rem;
-}
-
-/* Reduce the size of the nav items */
-.nav-link {
-  font-size: 1rem;
-}
-
-/* Add margin to the nav items */
-.nav-link:not(:last-child) {
-  margin-right: 0.5rem;
-}
-
-/* Reduce the font size of the form inputs */
-.form-control {
-  font-size: 1rem;
-}
-
-/* Add margin to the form inputs */
-.form-control:not(:last-child) {
-  margin-right: 0.5rem;
-}
-
-/* Reduce the font size of the form button */
-.btn {
-  font-size: 1rem;
-}
-
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    .dropdown-item {
+        color: #fff;
+    }
 
 </style>
 
+
 	<script>
+
+
+function setVelgDagText(text) {
+    document.getElementById("velgDagLink").innerHTML = text;
+}
+
+
 
 
 
 $(document).ready(function() {
   const paths = $('[id^="Plass_id_"]');
   const datoInput = $("input[placeholder='Dato']");
-  const navLinks = $(".nav-item.nav-link");
+  const navLinks = $(".dropdown-item");
 
   paths.click(function(event) {
     event.preventDefault();
@@ -103,7 +83,7 @@ $(document).ready(function() {
 
 //kaller funksjon når man klikker på menyen
 $(document).ready(function() {
-  $('.nav-link').click(function(event) {
+  $('.dropdown-item').click(function(event) {
     event.preventDefault();
     var dato = $(this).text().trim().split(" ")[1];
     $.ajax({
@@ -196,35 +176,55 @@ function validateForm() {
 {% endif %}
 
 <div class="m-4">
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-            <a href="/" class="navbar-brand">På kontoret?</a>
-            <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse1">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarCollapse1">
-                <div class="navbar-nav">
-                    {% for dag, dato in ukedager.items() %}
-                    <a href="#" class="nav-item nav-link" id="mein_knapp">{{ dag }} {{ dato }}</a>
-                     {% endfor %}
-
-                </div>
-<form class="d-flex ms-auto" method="POST" onsubmit="return validateForm()">
-    <input type="text" class="form-control me-sm-2" id="Navn" name="Navn" placeholder="Navn" required>
-	<input type="text" class="form-control me-sm-2" id="Kode" name="Kode" placeholder="Kode" >
-    <input class="form-control" readonly type="text" id="Plass" name="Plass" placeholder="Plass" style="background-color: gray">
-    <input class="form-control" readonly type="text" id="Dato" name="Dato"  placeholder="Dato" style="background-color: gray">
-    <button type="submit" class="btn btn-outline-light" formaction="/book">Book</button>
-	<button type="submit" class="btn btn-outline-light" formaction="/unbook">Unbook</button>
-
-</form>
-
-
-
-            </div>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a href="/" class="navbar-brand">På kontoret?</a>
+      <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarCollapse1">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse1">
+        <div class="navbar-nav">
+          <div class="dropdown">
+            <a id="velgDagLink" class="nav-item nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Velg Dag
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+              {% for dag, dato in ukedager.items() %}
+              <li><a class="dropdown-item" href="#" onclick="setVelgDagText('{{ dag }} {{ dato }}')">{{ dag }} {{ dato }}</a></li>
+              {% endfor %}
+            </ul>
+          </div>
         </div>
-    </nav>
+        <form class="d-flex ms-auto row gx-3 gy-2 align-items-center" method="POST" onsubmit="return validateForm()">
+          <div class="col-auto">
+            <input type="text" class="form-control" id="Navn" name="Navn" placeholder="Navn" required>
+          </div>
+          <div class="col-auto">
+            <input type="text" class="form-control" id="Kode" name="Kode" placeholder="Kode">
+          </div>
+          <div class="col-6 d-md-none">
+            <input class="form-control" readonly type="text" id="Plass" name="Plass" placeholder="Plass" style="background-color: gray">
+          </div>
+          <div class="col-6 d-md-none">
+            <input class="form-control" readonly type="text" id="Dato" name="Dato" placeholder="Dato" style="background-color: gray">
+          </div>
+          <div class="col-md-auto d-none d-md-block">
+            <input class="form-control" readonly type="text" id="Plass" name="Plass" placeholder="Plass" style="background-color: gray">
+          </div>
+          <div class="col-md-auto d-none d-md-block">
+            <input class="form-control" readonly type="text" id="Dato" name="Dato" placeholder="Dato" style="background-color: gray">
+          </div>
+          <div class="col-auto">
+            <button type="submit" class="btn btn-outline-light" formaction="/book">Book</button>
+            <button type="submit" class="btn btn-outline-light" formaction="/unbook">Unbook</button>
+          </div>
+        </form>
+      </div>
     </div>
+  </nav>
+</div>
+
+
 
 
 <style>
@@ -806,6 +806,11 @@ function validateForm() {
 	</g>
 								</a>
 </svg>
+
+
+
+
+
 
 
 </div>
