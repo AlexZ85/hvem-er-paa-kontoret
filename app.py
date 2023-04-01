@@ -55,7 +55,16 @@ def book():
     navn = request.form.get('Navn')
     plass = request.form.get('Plass')
     dato = request.form.get('Dato')
-    return render_template('home.html',popup=db.book_plass(navn, plass, dato),ukedager=list_weekday_dates())
+    kode = request.form.get('Kode')
+    return render_template('home.html',popup=db.book_plass(navn, plass, dato, kode),ukedager=list_weekday_dates())
+
+@app.route('/unbook', methods=['POST'])
+def unbook():
+    navn = request.form.get('Navn')
+    plass = request.form.get('Plass')
+    dato = request.form.get('Dato')
+    kode = request.form.get('Kode')
+    return render_template('home.html',popup=db.unbook_plass(navn, plass, dato, kode),ukedager=list_weekday_dates())
 
 
 if __name__ == "__main__":
