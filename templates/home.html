@@ -7,6 +7,7 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js" integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N" crossorigin="anonymous"></script>
 	<script src="https://d3js.org/d3.v7.min.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 
 <style>
@@ -22,8 +23,52 @@
     fill: blue;
   }
 
-</style>
+/* CSS for mobile devices */
 
+/* Set the font size to 16px */
+html {
+  font-size: 16px;
+}
+
+/* Set the navbar to collapse on smaller screens */
+.navbar-collapse {
+  flex-basis: 100%;
+  flex-grow: 1;
+}
+
+/* Reduce the size of the navbar brand */
+.navbar-brand {
+  font-size: 1.5rem;
+}
+
+/* Reduce the size of the nav items */
+.nav-link {
+  font-size: 1rem;
+}
+
+/* Add margin to the nav items */
+.nav-link:not(:last-child) {
+  margin-right: 0.5rem;
+}
+
+/* Reduce the font size of the form inputs */
+.form-control {
+  font-size: 1rem;
+}
+
+/* Add margin to the form inputs */
+.form-control:not(:last-child) {
+  margin-right: 0.5rem;
+}
+
+/* Reduce the font size of the form button */
+.btn {
+  font-size: 1rem;
+}
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+</style>
 
 	<script>
 
@@ -756,15 +801,6 @@ function validateForm() {
 	</g>
 								</a>
 </svg>
-
-
-<script>
-
-
-</script>
-
-
-
 
 
 </div>
