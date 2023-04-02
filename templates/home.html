@@ -45,15 +45,17 @@
 	<script>
 
 
+
 function setVelgDagText(text) {
     document.getElementById("velgDagLink").innerHTML = text;
 }
 
 
 
-
-
 $(document).ready(function() {
+
+
+
   const paths = $('[id^="Plass_id_"]');
   const datoInput = $("input[placeholder='Dato']");
   const navLinks = $(".dropdown-item");
@@ -92,20 +94,23 @@ $(document).ready(function() {
       dataType: 'json',
       data: {'dato': dato},
       success: function(data) {
-  console.log(data);
+
 
 
   var oppttate_plasser = data;
 const pathsx = document.querySelectorAll("[id^='Plass_id_']");
 const textbox = document.querySelector("input[placeholder='Plass']");
+console.log(textbox)
 
 for (let i = 0; i < pathsx.length; i++) {
   pathsx[i].addEventListener("click", function(event) {
     const id = this.getAttribute("id").replace("Plass_id_", "");
+
     if (this.getAttribute("fill") !== "red" && !oppttate_plasser.some(p => p.plass_id === id)) {
       event.preventDefault();
       textbox.value = "";
       textbox.value += id + " ";
+      console.log(textbox.value)
     }
   });
 }
@@ -201,12 +206,6 @@ function validateForm() {
           </div>
           <div class="col-auto">
             <input type="text" class="form-control" id="Kode" name="Kode" placeholder="Kode">
-          </div>
-          <div class="col-6 d-md-none">
-            <input class="form-control" readonly type="text" id="Plass" name="Plass" placeholder="Plass" style="background-color: gray">
-          </div>
-          <div class="col-6 d-md-none">
-            <input class="form-control" readonly type="text" id="Dato" name="Dato" placeholder="Dato" style="background-color: gray">
           </div>
           <div class="col-md-auto d-none d-md-block">
             <input class="form-control" readonly type="text" id="Plass" name="Plass" placeholder="Plass" style="background-color: gray">
@@ -656,6 +655,7 @@ function validateForm() {
 			<path id="Layer" class="s1" d="m213 569.5h8v-4h-8z"/>
 			<path id="Layer" class="s1" d="m197 585.5h40m-38.5-4.5h37m-37-2.5h37m-37-2.5h37m-24.5-2.5v-2.5m12 2.5v-2.5m-24.5 2.5h37"/>
 		</g>
+
 			</g>
 						</a>
 
