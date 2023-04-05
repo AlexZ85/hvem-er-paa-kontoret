@@ -6,8 +6,6 @@ from sqlalchemy import create_engine
 
 app = Flask(__name__)
 
-
-
 db_connection_string = "mysql+pymysql://sdvpe5m9dgho5tsl80b1:pscale_pw_t6s60C3KBfke7tY8ihjipWK6diw5wVQqOtyI7Av2SQA" \
                        "@aws.connect.psdb.cloud/paakontoret "
 engine = create_engine(db_connection_string, connect_args={
@@ -38,9 +36,10 @@ def list_weekday_dates():
     # Print the dictionary of weekday dates
     return weekday_dates
 
+
 @app.route("/")
 def load_booked_plasser():
-    return render_template('home.html', ukedager=list_weekday_dates() )
+    return render_template('home.html', ukedager=list_weekday_dates())
 
 
 @app.route('/hent_bookings', methods=['POST'])
@@ -56,7 +55,8 @@ def book():
     plass = request.form.get('Plass')
     dato = request.form.get('Dato')
     kode = request.form.get('Kode')
-    return render_template('home.html',popup=db.book_plass(navn, plass, dato, kode),ukedager=list_weekday_dates())
+    return render_template('home.html', popup=db.book_plass(navn, plass, dato, kode), ukedager=list_weekday_dates())
+
 
 @app.route('/unbook', methods=['POST'])
 def unbook():
@@ -64,8 +64,8 @@ def unbook():
     plass = request.form.get('Plass')
     dato = request.form.get('Dato')
     kode = request.form.get('Kode')
-    return render_template('home.html',popup=db.unbook_plass(navn, plass, dato, kode),ukedager=list_weekday_dates())
+    return render_template('home.html', popup=db.unbook_plass(navn, plass, dato, kode), ukedager=list_weekday_dates())
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=False,ssl_context='adhoc')
+    app.run(host='0.0.0.0', port=80, debug=False, ssl_context='adhoc')
