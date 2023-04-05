@@ -2,19 +2,19 @@ from flask import Flask, render_template, request, jsonify
 import datetime as dt
 from datetime import datetime as datetime
 import database as db
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 
 app = Flask(__name__)
 
 
 
-db_connection_string = "mysql+pymysql://sdvpe5m9dgho5tsl80b1:pscale_pw_t6s60C3KBfke7tY8ihjipWK6diw5wVQqOtyI7Av2SQA@aws.connect.psdb.cloud/paakontoret"
+db_connection_string = "mysql+pymysql://sdvpe5m9dgho5tsl80b1:pscale_pw_t6s60C3KBfke7tY8ihjipWK6diw5wVQqOtyI7Av2SQA" \
+                       "@aws.connect.psdb.cloud/paakontoret "
 engine = create_engine(db_connection_string, connect_args={
     "ssl": {
         "ssl_ca": "/etc/ssl/cert.pem"
     }
-
-})
+}, pool_pre_ping=True)
 
 
 def list_weekday_dates():
