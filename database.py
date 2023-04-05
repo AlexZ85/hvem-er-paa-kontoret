@@ -6,8 +6,7 @@ engine = create_engine(db_connection_string, connect_args={
     "ssl": {
         "ssl_ca": "/etc/ssl/cert.pem"
     }
-
-})
+}, pool_pre_ping=True)
 
 
 def load_plasser_from_db(dato):
