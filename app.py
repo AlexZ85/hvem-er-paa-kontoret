@@ -1,10 +1,11 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash
 import datetime as dt
 from datetime import datetime as datetime
 import database as db
 from sqlalchemy import create_engine
 
 app = Flask(__name__)
+app.secret_key = '!Alexxx!02'
 
 db_connection_string = "mysql+pymysql://sdvpe5m9dgho5tsl80b1:pscale_pw_t6s60C3KBfke7tY8ihjipWK6diw5wVQqOtyI7Av2SQA" \
                        "@aws.connect.psdb.cloud/paakontoret "
@@ -55,7 +56,10 @@ def book():
     plass = request.form.get('Plass')
     dato = request.form.get('Dato')
     kode = request.form.get('Kode')
-    return render_template('home.html', popup=db.book_plass(navn, plass, dato, kode), ukedager=list_weekday_dates())
+    popup = db.book_plass(navn, plass, dato, kode)
+    flash(popup)
+    #return render_template('home.html', popup=db.book_plass(navn, plass, dato, kode), ukedager=list_weekday_dates())
+    return redirect(url_for('load_booked_plasser'))
 
 
 @app.route('/unbook', methods=['POST'])
@@ -64,7 +68,10 @@ def unbook():
     plass = request.form.get('Plass')
     dato = request.form.get('Dato')
     kode = request.form.get('Kode')
-    return render_template('home.html', popup=db.unbook_plass(navn, plass, dato, kode), ukedager=list_weekday_dates())
+    popup = db.unbook_plass(navn, plass, dato, kode)
+    flash(popup)
+    #return render_template('home.html', popup=db.unbook_plass(navn, plass, dato, kode), ukedager=list_weekday_dates())
+    return redirect(url_for('load_booked_plasser'))
 
 
 if __name__ == "__main__":

@@ -173,12 +173,16 @@ function validateForm() {
 </head>
 
 <body style="background-color: #343a40 ">
-{% if popup %}
-  <div class="alert alert-{{ popup.status }}" >
-    {{ popup.message }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-  </div>
-{% endif %}
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <div class="alert alert-{{ messages[0].status }}" role="alert">
+      {{ messages[0].message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endif %}
+{% endwith %}
+
+
 
 <div class="m-4">
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
