@@ -1,78 +1,121 @@
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.exc import SQLAlchemyError
 
-db_connection_string = "mysql+pymysql://79kexqsirs64sn6p9efl:pscale_pw_sR4nRGuRIw8SBA1TpCOkIxYgxYnoJNf89zaF2eQuqSw@aws.connect.psdb.cloud/paakontoret"
+# --------------------------
+# Database setup
+# --------------------------
 
-engine = create_engine(db_connection_string, connect_args={
-    "ssl": {
-        "ssl_ca": "/etc/ssl/cert.pem"
-    }
-}, pool_pre_ping=True)
+engine = create_engine("sqlite:///paakontoret.db", echo=True)
+Base = declarative_base()
+Session = sessionmaker(bind=engine)
 
+# --------------------------
+# ORM Model
+# --------------------------
+
+class Booking(Base):
+    __tablename__ = 'bookingsv2'
+
+    bookings_id = Column(Integer, primary_key=True, autoincrement=True)
+    plass_id = Column(String(45))
+    bruker_id = Column(String(45))
+    bookings_dato = Column(String(45))  # Could also use Date type
+    kode = Column(String(45))
+
+# Create the table if it doesn't exist
+Base.metadata.create_all(engine)
+
+# --------------------------
+# Initial test data (optional)
+# --------------------------
+
+def insert_test_data():
+    session = Session()
+    try:
+        session.add_all([
+            Booking(plass_id='1', bruker_id='alex', bookings_dato='20-06-2025', kode='abc'),
+            Booking(plass_id='2', bruker_id='sofia', bookings_dato='20-06-2025', kode='def')
+        ])
+        session.commit()
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Error inserting test data: {e}")
+    finally:
+        session.close()
+
+# insert_test_data()  # Uncomment to run
+
+# --------------------------
+# Logic Functions
+# --------------------------
 
 def load_plasser_from_db(dato):
-    plasser = {}
-    with engine.connect() as conn:
-        result = conn.execute(text(f"SELECT plass_id,bruker_id,bookings_dato FROM paakontoret.bookingsv2"
-                                   f" Where bookings_dato = '{dato}';"))
+    session = Session()
+    try:
+        results = session.query(Booking.plass_id, Booking.bruker_id, Booking.bookings_dato)\
+                         .filter(Booking.bookings_dato == dato)\
+                         .all()
 
-        data_list = []
-        for row in result.all():
-            data_dict = dict(zip(result.keys(), row))
-            data_list.append(data_dict)
-
-        plasser = data_list
-        print(plasser)
-        return plasser
+        return [
+            {
+                "plass_id": r.plass_id,
+                "bruker_id": r.bruker_id,
+                "bookings_dato": r.bookings_dato
+            } for r in results
+        ]
+    finally:
+        session.close()
 
 
 def book_plass(navn, booket_plass, booket_dato, kode):
-    # check if there are any existing bookings with the same plass_id and bookings_dato
-    query = text("""
-    SELECT count(*) as count
-    FROM paakontoret.bookingsv2
-    WHERE plass_id = :plass_id AND bookings_dato = :bookings_dato
-    """)
-    with engine.connect() as conn:
-        result = conn.execute(query, {"plass_id": booket_plass, "bookings_dato": booket_dato})
-        count = result.fetchone()[0]
+    session = Session()
+    try:
+        existing = session.query(Booking)\
+            .filter(Booking.plass_id == booket_plass)\
+            .filter(Booking.bookings_dato == booket_dato)\
+            .first()
 
-        if count > 0:
-            feil_popup = {'message': 'Plassen var allerede booket!', 'status': 'danger'}
-            return feil_popup
-        else:
-            # insert the new booking
-            query = text("""
-            INSERT INTO paakontoret.bookingsv2 (plass_id, bruker_id, bookings_dato, kode)
-            VALUES (:plass_id, :bruker_id, :bookings_dato, :kode)
-            """)
-            result = conn.execute(query, {"plass_id": booket_plass, "bruker_id": navn, "bookings_dato": booket_dato,
-                                          "kode": kode})
-            print(f"{result.rowcount} rows inserted")
-            ok_popup = {'message': 'Plassen er booket!', 'status': 'success'}
-            return ok_popup
+        if existing:
+            return {'message': 'Plassen var allerede booket!', 'status': 'danger'}
+
+        new_booking = Booking(
+            plass_id=booket_plass,
+            bruker_id=navn,
+            bookings_dato=booket_dato,
+            kode=kode
+        )
+        session.add(new_booking)
+        session.commit()
+        return {'message': 'Plassen er booket!', 'status': 'success'}
+
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Error occurred: {e}")
+        return {'message': 'En feil oppstod ved booking.', 'status': 'danger'}
+    finally:
+        session.close()
 
 
 def unbook_plass(navn, booket_plass, booket_dato, kode):
-    # check if there are any existing bookings with the same plass_id, bookings_dato, and kode
-    query = text("""
-    SELECT count(*) as count
-    FROM paakontoret.bookingsv2
-    WHERE plass_id = :plass_id AND bookings_dato = :bookings_dato AND kode = :kode
-    """)
+    session = Session()
+    try:
+        booking = session.query(Booking)\
+            .filter(Booking.plass_id == booket_plass)\
+            .filter(Booking.bookings_dato == booket_dato)\
+            .filter(Booking.kode == kode)\
+            .first()
 
-    delete_query = text("""DELETE FROM paakontoret.bookingsv2 WHERE plass_id = :plass_id AND kode = :kode""")
-    with engine.connect() as conn:
-        result = conn.execute(query, {"plass_id": booket_plass, "bookings_dato": booket_dato, "kode": kode})
-        count = result.fetchone()[0]
+        if booking:
+            session.delete(booking)
+            session.commit()
+            return {'message': 'Plassen er slettet!', 'status': 'success'}
 
-        if count == 1:
-            result = conn.execute(delete_query, {"plass_id": booket_plass, "kode": kode})
-            print(result)
-            print(f"{result.rowcount} rows deleted")
-            ok_popup = {'message': 'Plassen er slettet!', 'status': 'success'}
+        return {'message': 'Feil kode eller finner ikke bookingen', 'status': 'danger'}
 
-            return ok_popup
-        else:
-            feil_popup = {'message': 'Feil kode eller finner ikke bookingen', 'status': 'danger'}
-            return feil_popup
-
+    except SQLAlchemyError as e:
+        session.rollback()
+        print(f"Error occurred: {e}")
+        return {'message': 'En feil oppstod ved sletting.', 'status': 'danger'}
+    finally:
+        session.close()
